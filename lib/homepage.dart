@@ -25,10 +25,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void checkBoxChanged(int index) {
-    setState(() {
-      dummyData[index][1] = !dummyData[index][1];
+  setState(() {
+    dummyData[index][1] = !dummyData[index][1];
+    
+    // Introduce a delay before calling deleteTask
+    Future.delayed(const Duration(seconds: 1), () {
+      deleteTask(index);
     });
-  }
+  });
+}
+
 
   void deleteTask(int index) {
     setState(() {
