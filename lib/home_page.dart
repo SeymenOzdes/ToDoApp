@@ -1,4 +1,5 @@
 import "package:first_app/todo_item.dart";
+import "package:first_app/todo_list_data.dart";
 import "package:flutter/material.dart";
 
 class HomePage extends StatefulWidget {
@@ -10,24 +11,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List dummyData = [
-    [
-      "drink water",
-      false
-    ], // ikinci değer olarak chechked durumu almalı mı emin değilim?
-    ["take out the trash", false],
+  List<TodoListData> todoItems = [
+    TodoListData(taskName: "Drink water", taskCompleted: false),
+    TodoListData(taskName: "Take out the trash", taskCompleted: false),
   ];
   final _textController = TextEditingController();
 
   void saveTask() {
-    dummyData.add([_textController.text, false]);
+    todoItems.add(TodoListData(taskName: _textController.text, taskCompleted: false));
     _textController.clear();
   }
 
   void checkBoxChanged(int index) {
     setState(() {
-      if (!dummyData[index][1]) { // check user click just one time. 
-        dummyData[index][1] = !dummyData[index][1];
+      if (!todoItems[index].taskCompleted) { // check user click just one time. 
+        todoItems[index].taskCompleted = !todoItems[index].taskCompleted;
 
         Future.delayed(const Duration(seconds: 1), () {
           deleteTask(index);
@@ -38,7 +36,7 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask(int index) {
     setState(() {
-      dummyData.removeAt(index);
+      todoItems.removeAt(index);
     });
   }
 
@@ -54,11 +52,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color.fromARGB(255, 138, 20, 189),
       ),
       body: ListView.builder(
-        itemCount: dummyData.length,
+        itemCount: todoItems.length,
         itemBuilder: (BuildContext context, index) {
           return ToDoItem(
-            taskName: dummyData[index][0],
-            taskCompleted: dummyData[index][1],
+            taskName: todoItems[index].taskName,
+            taskCompleted: todoItems[index].taskCompleted,
             onChanged: (value) => checkBoxChanged(index),
             deleteTask: (contex) => deleteTask(index),
           );
