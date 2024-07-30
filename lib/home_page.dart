@@ -12,14 +12,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<TodoListData> todoItems = [
-    TodoListData(taskName: "Drink water", taskCompleted: false),
-    TodoListData(taskName: "Take out the trash", taskCompleted: false),
+    TodoListData(
+        taskName: "Drink water", taskCompleted: false, isVisible: true),
+    TodoListData(
+        taskName: "Take out the trash", taskCompleted: false, isVisible: true),
   ];
   final _textController = TextEditingController();
 
   void saveTask() {
-    todoItems.add(
-        TodoListData(taskName: _textController.text, taskCompleted: false));
+    todoItems.add(TodoListData(
+        taskName: _textController.text, taskCompleted: false, isVisible: true));
     _textController.clear();
   }
 
@@ -38,7 +40,7 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask(int index) {
     setState(() {
-      todoItems.removeAt(index);
+      todoItems[index].isVisible = false;
     });
   }
 
@@ -56,15 +58,17 @@ class _HomePageState extends State<HomePage> {
       body: ListView.builder(
         itemCount: todoItems.length,
         itemBuilder: (BuildContext context, index) {
-          return ToDoItem(
-            taskName: todoItems[index].taskName,
-            taskCompleted: todoItems[index].taskCompleted,
-            onChanged: (value) => checkBoxChanged(index),
-            deleteTask: (contex) => deleteTask(index),
+          return Visibility(
+            visible: todoItems[index].isVisible,
+            child: ToDoItem(
+              taskName: todoItems[index].taskName,
+              taskCompleted: todoItems[index].taskCompleted,
+              onChanged: (value) => checkBoxChanged(index),
+              deleteTask: (contex) => deleteTask(index),
+            ),
           );
         },
       ),
-      // floating action button
       floatingActionButton: Row(
         children: [
           Expanded(
