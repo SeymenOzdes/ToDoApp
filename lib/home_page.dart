@@ -18,13 +18,15 @@ class _HomePageState extends State<HomePage> {
   final _textController = TextEditingController();
 
   void saveTask() {
-    todoItems.add(TodoListData(taskName: _textController.text, taskCompleted: false));
+    todoItems.add(
+        TodoListData(taskName: _textController.text, taskCompleted: false));
     _textController.clear();
   }
 
   void checkBoxChanged(int index) {
     setState(() {
-      if (!todoItems[index].taskCompleted) { // check user click just one time. 
+      if (!todoItems[index].taskCompleted) {
+        // check user click just one time.
         todoItems[index].taskCompleted = !todoItems[index].taskCompleted;
 
         Future.delayed(const Duration(seconds: 1), () {
@@ -96,7 +98,9 @@ class _HomePageState extends State<HomePage> {
           FloatingActionButton(
             onPressed: () {
               setState(() {
-                saveTask();
+                if (_textController.text.isNotEmpty) {
+                  saveTask();
+                }
               });
             },
             child: const Icon(Icons.add),
