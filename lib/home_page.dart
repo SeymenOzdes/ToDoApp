@@ -38,9 +38,13 @@ class _HomePageState extends State<HomePage> {
         taskName: _textController.text,
         taskCompleted: false,
       );
-      await _databaseHelper.insertTodo(todo);
-      _textController.clear();
-      await _loadTodos();
+      try {
+        await _databaseHelper.insertTodo(todo);
+        _textController.clear();
+        await _loadTodos();
+      } catch (e) {
+        log.e('Error inserting todo: $e');
+      }
     }
   }
 
@@ -51,6 +55,7 @@ class _HomePageState extends State<HomePage> {
         id: todo.id,
         taskName: todo.taskName,
         taskCompleted: !todo.taskCompleted,
+        isVisible: false,
       );
       _databaseHelper.updateTodo(updatedTodo);
       if (updatedTodo.taskCompleted) {
@@ -63,9 +68,16 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask(int index) async {
     final todo = todoItems[index];
-    await _databaseHelper.deleteTodo(todo.id!);
+    final updatedTodo = TodoModel(
+      id: todo.id,
+      taskName: todo.taskName,
+      taskCompleted: todo.taskCompleted,
+      isVisible: false,
+    );
+    await _databaseHelper.updateTodo(updatedTodo);
+
     setState(() {
-      todoItems.removeAt(index);
+      todoItems[index] = updatedTodo;
     });
   }
 
@@ -84,7 +96,7 @@ class _HomePageState extends State<HomePage> {
         itemCount: todoItems.length,
         itemBuilder: (BuildContext context, index) {
           return Visibility(
-            visible: !todoItems[index].taskCompleted,
+            visible: todoItems[index].isVisible,
             child: ToDoItem(
               taskName: todoItems[index].taskName,
               taskCompleted: todoItems[index].taskCompleted,

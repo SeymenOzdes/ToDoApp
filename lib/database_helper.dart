@@ -1,7 +1,6 @@
 import 'package:sqflite/sqflite.dart';
-// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
-import 'todo_model.dart'; // TodoModel sınıfını içe aktar
+import 'todo_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -21,11 +20,20 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Veritabanı versiyonunu artırın
       onCreate: (db, version) async {
         await db.execute(
-          'CREATE TABLE todos(id INTEGER PRIMARY KEY AUTOINCREMENT, taskName TEXT, taskCompleted INTEGER)',
+          'CREATE TABLE todos('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+          'taskName TEXT, '
+          'taskCompleted INTEGER, '
+          'isVisible INTEGER)',
         );
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < newVersion) {
+          await db.execute('ALTER TABLE todos ADD COLUMN isVisible INTEGER DEFAULT 1');
+        }
       },
     );
   }
@@ -58,12 +66,12 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteTodo(int id) async {
-    final db = await database;
-    await db.delete(
-      'todos',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
+  // Future<void> deleteTodo(int id) async {
+  //   final db = await database;
+  //   await db.delete(
+  //     'todos',
+  //     where: 'id = ?',
+  //     whereArgs: [id],
+  //   );
+  // }
 }
