@@ -1,4 +1,4 @@
-import "package:first_app/todoitem.dart";
+import "package:first_app/todo_item.dart";
 import "package:flutter/material.dart";
 
 class HomePage extends StatefulWidget {
@@ -25,16 +25,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   void checkBoxChanged(int index) {
-  setState(() {
-    dummyData[index][1] = !dummyData[index][1];
-    
-    // Introduce a delay before calling deleteTask
-    Future.delayed(const Duration(seconds: 1), () {
-      deleteTask(index);
-    });
-  });
-}
+    setState(() {
+      if (!dummyData[index][1]) { // check user click just one time. 
+        dummyData[index][1] = !dummyData[index][1];
 
+        Future.delayed(const Duration(seconds: 1), () {
+          deleteTask(index);
+        });
+      }
+    });
+  }
 
   void deleteTask(int index) {
     setState(() {
