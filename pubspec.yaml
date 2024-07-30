@@ -38,6 +38,9 @@ dependencies:
   cupertino_icons: ^1.0.6
   loadmore: ^2.1.0
   flutter_slidable: ^3.1.1
+  sqflite: ^2.3.3+1
+  sqflite_common_ffi: ^2.3.3
+  logger: ^2.4.0
   
 dev_dependencies:
   flutter_test:
@@ -49,7 +52,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

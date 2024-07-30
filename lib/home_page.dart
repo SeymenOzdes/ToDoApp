@@ -1,6 +1,8 @@
-import "package:first_app/todo_item.dart";
-import "package:first_app/todo_list_data.dart";
-import "package:flutter/material.dart";
+import 'package:first_app/todo_model.dart';
+import 'package:first_app/database_helper.dart';
+import 'package:first_app/todo_item.dart';
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,26 +13,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<TodoListData> todoItems = [
-    TodoListData(
-        taskName: "Drink water", taskCompleted: false, isVisible: true),
-    TodoListData(
-        taskName: "Take out the trash", taskCompleted: false, isVisible: true),
-  ];
+  List<TodoModel> todoItems = [];
   final _textController = TextEditingController();
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  var log = Logger();
 
-  void saveTask() {
-    todoItems.add(TodoListData(
-        taskName: _textController.text, taskCompleted: false, isVisible: true));
-    _textController.clear();
+  @override
+  void initState() {
+    super.initState();
+    _loadTodos();
   }
 
-  void checkBoxChanged(int index) {
+  Future<void> _loadTodos() async {
+    final todos = await _databaseHelper.getTodos();
     setState(() {
-      if (!todoItems[index].taskCompleted) {
-        // check user click just one time.
-        todoItems[index].taskCompleted = !todoItems[index].taskCompleted;
+      todoItems = todos;
+    });
+  }
 
+  void saveTask() async {
+    if (_textController.text.isNotEmpty) {
+      final todo = TodoModel(
+        id: null,
+        taskName: _textController.text,
+        taskCompleted: false,
+      );
+      await _databaseHelper.insertTodo(todo);
+      _textController.clear();
+      await _loadTodos();
+    }
+  }
+
+  void checkBoxChanged(int index) async {
+    setState(() {
+      final todo = todoItems[index];
+      final updatedTodo = TodoModel(
+        id: todo.id,
+        taskName: todo.taskName,
+        taskCompleted: !todo.taskCompleted,
+      );
+      _databaseHelper.updateTodo(updatedTodo);
+      if (updatedTodo.taskCompleted) {
         Future.delayed(const Duration(seconds: 1), () {
           deleteTask(index);
         });
@@ -38,9 +61,11 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void deleteTask(int index) {
+  void deleteTask(int index) async {
+    final todo = todoItems[index];
+    await _databaseHelper.deleteTodo(todo.id!);
     setState(() {
-      todoItems[index].isVisible = false;
+      todoItems.removeAt(index);
     });
   }
 
@@ -59,12 +84,12 @@ class _HomePageState extends State<HomePage> {
         itemCount: todoItems.length,
         itemBuilder: (BuildContext context, index) {
           return Visibility(
-            visible: todoItems[index].isVisible,
+            visible: !todoItems[index].taskCompleted,
             child: ToDoItem(
               taskName: todoItems[index].taskName,
               taskCompleted: todoItems[index].taskCompleted,
               onChanged: (value) => checkBoxChanged(index),
-              deleteTask: (contex) => deleteTask(index),
+              deleteTask: (context) => deleteTask(index),
             ),
           );
         },
@@ -101,11 +126,7 @@ class _HomePageState extends State<HomePage> {
           ),
           FloatingActionButton(
             onPressed: () {
-              setState(() {
-                if (_textController.text.isNotEmpty) {
-                  saveTask();
-                }
-              });
+              saveTask();
             },
             child: const Icon(Icons.add),
           ),
