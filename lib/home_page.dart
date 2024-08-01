@@ -3,6 +3,7 @@ import 'package:first_app/database_helper.dart';
 import 'package:first_app/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void saveTask() async {
+  Future<void> saveTask() async {
     if (_textController.text.isNotEmpty) {
       final todo = TodoModel(
         id: null,
@@ -49,24 +50,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   void checkBoxChanged(int index) async {
-    setState(() {
-      final todo = todoItems[index];
-      final updatedTodo = TodoModel(
-        id: todo.id,
-        taskName: todo.taskName,
-        taskCompleted: !todo.taskCompleted,
-        isVisible: false,
-      );
-      _databaseHelper.updateTodo(updatedTodo);
-      if (updatedTodo.taskCompleted) {
-        Future.delayed(const Duration(seconds: 1), () {
-          deleteTask(index);
-        });
-      }
-    });
+    final todo = todoItems[index];
+    final updatedTodo = TodoModel(
+      id: todo.id,
+      taskName: todo.taskName,
+      taskCompleted: !todo.taskCompleted,
+      isVisible: true,
+    );
+    await _databaseHelper.updateTodo(updatedTodo);
+    await _loadTodos();
+
+    await Future.delayed(const Duration(seconds: 1));
+    await deleteTask(index);
+    await _loadTodos();
+    setState(() {});
   }
 
-  void deleteTask(int index) async {
+  Future<void> deleteTask(int index) async {
     final todo = todoItems[index];
     final updatedTodo = TodoModel(
       id: todo.id,

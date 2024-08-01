@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'todo_model.dart';
@@ -13,6 +15,10 @@ class DatabaseHelper {
     _database = await _initDatabase();
     return _database!;
   }
+  Future<void> deleteDatabase() async {
+     final db = await database; 
+     await db.execute('DROP TABLE IF EXISTS todos');
+  }
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
@@ -20,7 +26,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // Veritabanı versiyonunu artırın
+      version: 2, 
       onCreate: (db, version) async {
         await db.execute(
           'CREATE TABLE todos('
@@ -30,11 +36,11 @@ class DatabaseHelper {
           'isVisible INTEGER)',
         );
       },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < newVersion) {
-          await db.execute('ALTER TABLE todos ADD COLUMN isVisible INTEGER DEFAULT 1');
-        }
-      },
+      // onUpgrade: (db, oldVersion, newVersion) async {
+      //   if (oldVersion < newVersion) {
+      //     await db.execute('ALTER TABLE todos ADD COLUMN isVisible INTEGER DEFAULT 1');
+      //   }
+      // },
     );
   }
 
@@ -64,6 +70,7 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [todo.id],
     );
+    
   }
 
   // Future<void> deleteTodo(int id) async {
