@@ -1,7 +1,7 @@
 import "package:first_app/home_page.dart";
 import "package:flutter/material.dart";
 void main() {
-  runApp(const Home()); // const eklenebilir Home() başına 
+  runApp(const Home()); 
 }
 
 class Home extends StatelessWidget {
@@ -12,7 +12,7 @@ class Home extends StatelessWidget {
     return  MaterialApp (
       title: "Home Page", 
       theme: ThemeData(scaffoldBackgroundColor: const Color.fromARGB(255, 162, 101, 226)),
-      home:   const HomePage()
+      home:  const HomePage()
     ); 
   }
 }

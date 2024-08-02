@@ -1,9 +1,10 @@
+import 'dart:async';
+import 'package:first_app/adding_todo_sheet.dart';
 import 'package:first_app/todo_model.dart';
 import 'package:first_app/database_helper.dart';
 import 'package:first_app/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,18 +16,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<TodoModel> todoItems = [];
-  final _textController = TextEditingController();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
+  final _textController = TextEditingController();
   var log = Logger();
 
   @override
   void initState() {
     super.initState();
+    Timer.periodic(const Duration(seconds: 20), (timer) {
+      _databaseHelper.deleteTodo();
+      
+      if (todoItems.isEmpty) {
+        timer.cancel();
+      }
+    });
     _loadTodos();
   }
 
   Future<void> _loadTodos() async {
     final todos = await _databaseHelper.getTodos();
+
     setState(() {
       todoItems = todos;
     });
@@ -40,6 +49,8 @@ class _HomePageState extends State<HomePage> {
         taskCompleted: false,
       );
       try {
+        log.i(todoItems.indexed);
+
         await _databaseHelper.insertTodo(todo);
         _textController.clear();
         await _loadTodos();
@@ -139,6 +150,12 @@ class _HomePageState extends State<HomePage> {
           FloatingActionButton(
             onPressed: () {
               saveTask();
+              showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return const AddingTodoSheet();
+                },
+              );
             },
             child: const Icon(Icons.add),
           ),

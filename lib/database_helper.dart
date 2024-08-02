@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'todo_model.dart';
@@ -9,15 +7,15 @@ class DatabaseHelper {
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
   static Database? _database;
-
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
+
   Future<void> deleteDatabase() async {
-     final db = await database; 
-     await db.execute('DROP TABLE IF EXISTS todos');
+    final db = await database;
+    await db.execute('DROP TABLE IF EXISTS todos');
   }
 
   Future<Database> _initDatabase() async {
@@ -26,7 +24,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, 
+      version: 2,
       onCreate: (db, version) async {
         await db.execute(
           'CREATE TABLE todos('
@@ -70,15 +68,14 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [todo.id],
     );
-    
   }
 
-  // Future<void> deleteTodo(int id) async {
-  //   final db = await database;
-  //   await db.delete(
-  //     'todos',
-  //     where: 'id = ?',
-  //     whereArgs: [id],
-  //   );
-  // }
+  Future<void> deleteTodo() async {
+  final db = await database;
+  await db.execute(
+    'DELETE FROM todos WHERE taskCompleted = ?',
+    [1],
+  );
+}
+
 }
