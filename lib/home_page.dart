@@ -23,9 +23,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Timer.periodic(const Duration(seconds: 20), (timer) {
+    Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
-      
+
       if (todoItems.isEmpty) {
         timer.cancel();
       }
@@ -72,23 +72,26 @@ class _HomePageState extends State<HomePage> {
     await _loadTodos();
 
     await Future.delayed(const Duration(seconds: 1));
-    await deleteTask(index);
+    await deleteTask(todo);
     await _loadTodos();
     setState(() {});
   }
 
-  Future<void> deleteTask(int index) async {
-    final todo = todoItems[index];
+  Future<void> deleteTask(TodoModel todo) async {
     final updatedTodo = TodoModel(
       id: todo.id,
       taskName: todo.taskName,
       taskCompleted: todo.taskCompleted,
       isVisible: false,
     );
+
     await _databaseHelper.updateTodo(updatedTodo);
 
     setState(() {
-      todoItems[index] = updatedTodo;
+      final index = todoItems.indexWhere((item) => item.id == todo.id);
+      if (index != -1) {
+        todoItems[index] = updatedTodo;
+      }
     });
   }
 
@@ -112,7 +115,7 @@ class _HomePageState extends State<HomePage> {
               taskName: todoItems[index].taskName,
               taskCompleted: todoItems[index].taskCompleted,
               onChanged: (value) => checkBoxChanged(index),
-              deleteTask: (context) => deleteTask(index),
+              deleteTask: (context) => deleteTask(todoItems[index]), 
             ),
           );
         },
