@@ -87,12 +87,10 @@ class _HomePageState extends State<HomePage> {
 
     await _databaseHelper.updateTodo(updatedTodo);
 
-    setState(() {
-      final index = todoItems.indexWhere((item) => item.id == todo.id);
-      if (index != -1) {
-        todoItems[index] = updatedTodo;
-      }
-    });
+    final index = todoItems.indexWhere((item) => item.id == todo.id);
+    if (index != -1) {
+      todoItems[index] = updatedTodo;
+    }
   }
 
   @override
@@ -115,7 +113,7 @@ class _HomePageState extends State<HomePage> {
               taskName: todoItems[index].taskName,
               taskCompleted: todoItems[index].taskCompleted,
               onChanged: (value) => checkBoxChanged(index),
-              deleteTask: (context) => deleteTask(todoItems[index]), 
+              deleteTask: (context) => deleteTask(todoItems[index]),
             ),
           );
         },
