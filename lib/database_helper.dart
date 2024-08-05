@@ -24,14 +24,16 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         await db.execute(
           'CREATE TABLE todos('
           'id INTEGER PRIMARY KEY AUTOINCREMENT, '
           'taskName TEXT, '
           'taskCompleted INTEGER, '
-          'isVisible INTEGER)',
+          'isVisible INTEGER)'
+          'taskDescription TEXT, '
+          'taskDate TEXT)',
         );
       },
       // onUpgrade: (db, oldVersion, newVersion) async {
@@ -39,6 +41,16 @@ class DatabaseHelper {
       //     await db.execute('ALTER TABLE todos ADD COLUMN isVisible INTEGER DEFAULT 1');
       //   }
       // },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 3) {
+          await db.execute(
+            'ALTER TABLE todos ADD COLUMN taskDescription TEXT',
+          );
+          await db.execute(
+            'ALTER TABLE todos ADD COLUMN taskDate TEXT',
+          );
+        }
+      },
     );
   }
 
@@ -71,11 +83,10 @@ class DatabaseHelper {
   }
 
   Future<void> deleteTodo() async {
-  final db = await database;
-  await db.execute(
-    'DELETE FROM todos WHERE taskCompleted = ?',
-    [1],
-  );
-}
-
+    final db = await database;
+    await db.execute(
+      'DELETE FROM todos WHERE taskCompleted = ?',
+      [1],
+    );
+  }
 }

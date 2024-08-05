@@ -2,13 +2,17 @@ class TodoModel {
   final int? id;
   final String taskName;
   final bool taskCompleted;
-  bool isVisible; 
+  bool isVisible;
+  final String taskDescription;
+  final DateTime taskDate;
 
   TodoModel({
     this.id,
     required this.taskName,
     required this.taskCompleted,
-    this.isVisible = true, 
+    this.isVisible = true,
+    required this.taskDescription,
+    required this.taskDate,
   });
 
   factory TodoModel.fromMap(Map<String, dynamic> map) {
@@ -17,6 +21,9 @@ class TodoModel {
       taskName: map['taskName'] as String,
       taskCompleted: map['taskCompleted'] == 1,
       isVisible: map['isVisible'] == 1,
+      taskDescription: map['taskDescription'] as String? ?? '',
+      taskDate: DateTime.tryParse(map['taskDate'] as String? ?? '') ??
+          DateTime.now(), // Varsayılan DateTime
     );
   }
 
@@ -26,7 +33,9 @@ class TodoModel {
       'id': id,
       'taskName': taskName,
       'taskCompleted': taskCompleted ? 1 : 0,
-      'isVisible': isVisible ? 1 : 0, 
+      'isVisible': isVisible ? 1 : 0,
+      'taskDescription': taskDescription,
+      'taskDate': taskDate.toIso8601String(),
     };
   }
 }

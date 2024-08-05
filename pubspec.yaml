@@ -41,6 +41,7 @@ dependencies:
   sqflite: ^2.3.3+1
   sqflite_common_ffi: ^2.3.3
   logger: ^2.4.0
+  path: ^1.9.0
   
 dev_dependencies:
   flutter_test:
