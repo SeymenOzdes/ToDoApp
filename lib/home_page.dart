@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   final _textController = TextEditingController();
-  final descriptionTextController = TextEditingController();
+  final _descriptionTextController = TextEditingController();
   DateTime dateTime = DateTime.now();
   List<TodoModel> todoItems = [];
   var log = Logger();
@@ -45,13 +45,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> saveTask() async {
     if (_textController.text.isNotEmpty &&
-        descriptionTextController.text.isNotEmpty) {
+        _descriptionTextController.text.isNotEmpty) {
       final todo = TodoModel(
         id: null,
         taskName: _textController.text,
         taskCompleted: false,
-        isVisible: true, // ekledim 
-        taskDescription: descriptionTextController.text,
+        isVisible: true, // ekledim
+        taskDescription: _descriptionTextController.text,
         taskDate: dateTime,
       );
       try {
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
 
         await _databaseHelper.insertTodo(todo);
         _textController.clear();
-        descriptionTextController.clear();
+        _descriptionTextController.clear();
         await _loadTodos();
       } catch (e) {
         log.e('Error inserting todo: $e');
@@ -119,12 +119,13 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: CupertinoDatePicker(
                       initialDateTime: dateTime,
+                      minimumYear: 2024,
                       onDateTimeChanged: (DateTime newTime) {
                         setState(() {
                           dateTime = newTime;
                         });
                       },
-                      mode: CupertinoDatePickerMode.date,
+                      mode: CupertinoDatePickerMode.dateAndTime,
                     ),
                   ),
                   ElevatedButton(
@@ -168,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TextField(
                       style: const TextStyle(fontSize: 18),
-                      controller: descriptionTextController,
+                      controller: _descriptionTextController,
                       decoration: const InputDecoration(
                         hintText: "Description",
                         hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
@@ -176,14 +177,12 @@ class _HomePageState extends State<HomePage> {
                         enabledBorder: InputBorder.none,
                       ),
                     ),
-                    // buraya
                     Row(
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              // bıraya gelicek
                               Navigator.pop(context);
                               showDatePickerSheet();
                             },
@@ -193,12 +192,30 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          saveTask();
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Save"))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton.filled(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _textController.clear();
+                                  _descriptionTextController.clear();
+                                },
+                                icon: const Icon(Icons.close)),
+                            ElevatedButton(
+                                onPressed: () {
+                                  saveTask();
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Save")),
+                          ],
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ));
@@ -226,6 +243,7 @@ class _HomePageState extends State<HomePage> {
               taskCompleted: todoItems[index].taskCompleted,
               onChanged: (value) => checkBoxChanged(index),
               deleteTask: (context) => deleteTask(todoItems[index]),
+              taskDate: todoItems[index].taskDate,
             ),
           );
         },
@@ -251,7 +269,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _textController.dispose();
-    descriptionTextController.dispose();
+    _descriptionTextController.dispose();
     super.dispose();
   }
 }

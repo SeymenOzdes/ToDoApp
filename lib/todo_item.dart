@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 
 class ToDoItem extends StatelessWidget {
   final String taskName;
   final bool taskCompleted;
+  final DateTime taskDate;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteTask;
 
@@ -13,10 +15,13 @@ class ToDoItem extends StatelessWidget {
     required this.taskCompleted,
     required this.onChanged,
     required this.deleteTask,
+    required this.taskDate,
   });
 
   @override
   Widget build(BuildContext context) {
+final DateFormat formatter = DateFormat('d MMMM, HH:mm');
+
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 0),
       child: Slidable(
@@ -39,17 +44,26 @@ class ToDoItem extends StatelessWidget {
                   onChanged: onChanged,
                   side: const BorderSide(color: Colors.white),
                 ),
-                Text(
-                  taskName,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    decoration: taskCompleted
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                    decorationColor: Colors.white,
-                    decorationThickness: 3,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      taskName,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        decoration: taskCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        decorationColor: Colors.white,
+                        decorationThickness: 3,
+                      ),
+                    ),
+                    Text(
+                      formatter.format(taskDate),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -23,7 +23,7 @@ class TodoModel {
       isVisible: map['isVisible'] == 1,
       taskDescription: map['taskDescription'] as String? ?? '',
       taskDate: DateTime.tryParse(map['taskDate'] as String? ?? '') ??
-          DateTime.now(), // Varsayılan DateTime
+          DateTime.now(), 
     );
   }
 
