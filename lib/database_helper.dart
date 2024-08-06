@@ -13,11 +13,6 @@ class DatabaseHelper {
     return _database!;
   }
 
-  // Future<void> deleteDatabase(String path) async {
-  //   final db = await database;
-  //   await db.execute('DROP TABLE IF EXISTS todos');
-  // }
-
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'todo.db');
@@ -35,7 +30,6 @@ class DatabaseHelper {
           'taskDescription TEXT, '
           'taskDate TEXT, '
           'taskCategory TEXT)',
-          
         );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
@@ -46,11 +40,11 @@ class DatabaseHelper {
           await db.execute(
             'ALTER TABLE todos ADD COLUMN taskDate TEXT',
           );
-          if (oldVersion < 4) { 
-          await db.execute(
-            'ALTER TABLE todos ADD COLUMN taskCategory TEXT', 
-          );
-        }
+          if (oldVersion < 4) {
+            await db.execute(
+              'ALTER TABLE todos ADD COLUMN taskCategory TEXT',
+            );
+          }
         }
       },
     );
@@ -91,10 +85,10 @@ class DatabaseHelper {
       [1],
     );
   }
-  Future<void> deleteDatabaseFile() async {
-  final dbPath = await getDatabasesPath();
-  final path = join(dbPath, 'todo.db');
-  await deleteDatabase(path);
-}
 
+  Future<void> deleteDatabaseFile() async {
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'todo.db');
+    await deleteDatabase(path);
+  }
 }

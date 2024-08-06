@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         isVisible: true, // ekledim
         taskDescription: descriptionTextController.text,
         taskDate: dateTime,
-        taskCategory: _selectedValue, 
+        taskCategory: _selectedValue,
       );
       try {
         log.i(todoItems.indexed);
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
       isVisible: true,
       taskDescription: todo.taskDescription,
       taskDate: dateTime,
-      taskCategory: _selectedValue, 
+      taskCategory: _selectedValue,
     );
     await _databaseHelper.updateTodo(updatedTodo);
     await _loadTodos();
@@ -92,14 +92,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> deleteTask(TodoModel todo) async {
     final updatedTodo = TodoModel(
-      id: todo.id,
-      taskName: todo.taskName,
-      taskCompleted: todo.taskCompleted,
-      isVisible: false,
-      taskDescription: todo.taskDescription,
-      taskDate: todo.taskDate,
-      taskCategory: todo.taskCategory
-    );
+        id: todo.id,
+        taskName: todo.taskName,
+        taskCompleted: todo.taskCompleted,
+        isVisible: false,
+        taskDescription: todo.taskDescription,
+        taskDate: todo.taskDate,
+        taskCategory: todo.taskCategory);
 
     await _databaseHelper.updateTodo(updatedTodo);
 
@@ -135,7 +134,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // handle save process
                       Navigator.pop(context);
                       showCustomBottomSheet();
                     },
@@ -225,7 +223,6 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        // crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           IconButton.filled(
                               onPressed: () {
@@ -235,11 +232,11 @@ class _HomePageState extends State<HomePage> {
                               },
                               icon: const Icon(Icons.close)),
                           IconButton.filled(
-                              onPressed: () {
-                                saveTask();
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(Icons.check),
+                            onPressed: () {
+                              saveTask();
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.check),
                           )
                         ],
                       ),
@@ -272,7 +269,7 @@ class _HomePageState extends State<HomePage> {
               onChanged: (value) => checkBoxChanged(index),
               deleteTask: (context) => deleteTask(todoItems[index]),
               taskDate: todoItems[index].taskDate,
-              taskCategory:todoItems[index].taskCategory ,
+              taskCategory: todoItems[index].taskCategory,
             ),
           );
         },
