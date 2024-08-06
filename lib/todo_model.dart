@@ -5,6 +5,7 @@ class TodoModel {
   bool isVisible;
   final String taskDescription;
   final DateTime taskDate;
+  final String taskCategory;
 
   TodoModel({
     this.id,
@@ -13,6 +14,7 @@ class TodoModel {
     this.isVisible = true,
     required this.taskDescription,
     required this.taskDate,
+    required this.taskCategory,
   });
 
   factory TodoModel.fromMap(Map<String, dynamic> map) {
@@ -22,8 +24,9 @@ class TodoModel {
       taskCompleted: map['taskCompleted'] == 1,
       isVisible: map['isVisible'] == 1,
       taskDescription: map['taskDescription'] as String? ?? '',
-      taskDate: DateTime.tryParse(map['taskDate'] as String? ?? '') ??
-          DateTime.now(), 
+      taskDate:
+          DateTime.tryParse(map['taskDate'] as String? ?? '') ?? DateTime.now(),
+      taskCategory: map['taskCategory'] as String? ?? '',
     );
   }
 
@@ -36,6 +39,7 @@ class TodoModel {
       'isVisible': isVisible ? 1 : 0,
       'taskDescription': taskDescription,
       'taskDate': taskDate.toIso8601String(),
+      'taskCategory': taskCategory,
     };
   }
 }

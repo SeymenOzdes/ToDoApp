@@ -1,6 +1,11 @@
 import "package:first_app/home_page.dart";
 import "package:flutter/material.dart";
-void main() {
+import 'database_helper.dart';
+import 'dart:async';
+Future<void> main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // final databaseHelper = DatabaseHelper();
+  // await databaseHelper.deleteDatabaseFile();
   runApp(const Home()); 
 }
 

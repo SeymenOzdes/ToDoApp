@@ -17,9 +17,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   final _textController = TextEditingController();
-  final _descriptionTextController = TextEditingController();
+  final descriptionTextController = TextEditingController();
   DateTime dateTime = DateTime.now();
   List<TodoModel> todoItems = [];
+  String _selectedValue = "";
+  final List<String> _categories = ["Gündelik", "İş", "Okul"];
   var log = Logger();
 
   @override
@@ -45,21 +47,22 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> saveTask() async {
     if (_textController.text.isNotEmpty &&
-        _descriptionTextController.text.isNotEmpty) {
+        descriptionTextController.text.isNotEmpty) {
       final todo = TodoModel(
         id: null,
         taskName: _textController.text,
         taskCompleted: false,
         isVisible: true, // ekledim
-        taskDescription: _descriptionTextController.text,
+        taskDescription: descriptionTextController.text,
         taskDate: dateTime,
+        taskCategory: _selectedValue, 
       );
       try {
         log.i(todoItems.indexed);
 
         await _databaseHelper.insertTodo(todo);
         _textController.clear();
-        _descriptionTextController.clear();
+        descriptionTextController.clear();
         await _loadTodos();
       } catch (e) {
         log.e('Error inserting todo: $e');
@@ -76,6 +79,7 @@ class _HomePageState extends State<HomePage> {
       isVisible: true,
       taskDescription: todo.taskDescription,
       taskDate: dateTime,
+      taskCategory: _selectedValue, 
     );
     await _databaseHelper.updateTodo(updatedTodo);
     await _loadTodos();
@@ -93,7 +97,8 @@ class _HomePageState extends State<HomePage> {
       taskCompleted: todo.taskCompleted,
       isVisible: false,
       taskDescription: todo.taskDescription,
-      taskDate: dateTime,
+      taskDate: todo.taskDate,
+      taskCategory: todo.taskCategory
     );
 
     await _databaseHelper.updateTodo(updatedTodo);
@@ -169,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TextField(
                       style: const TextStyle(fontSize: 18),
-                      controller: _descriptionTextController,
+                      controller: descriptionTextController,
                       decoration: const InputDecoration(
                         hintText: "Description",
                         hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
@@ -193,29 +198,52 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.only(left: 12, top: 12),
                       child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton.filled(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  _textController.clear();
-                                  _descriptionTextController.clear();
-                                },
-                                icon: const Icon(Icons.close)),
-                            ElevatedButton(
-                                onPressed: () {
-                                  saveTask();
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Save")),
-                          ],
+                        alignment: Alignment.bottomLeft,
+                        child: DropdownButton<String>(
+                          value: _categories.contains(_selectedValue)
+                              ? _selectedValue
+                              : null,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedValue = newValue ?? "";
+                            });
+                          },
+                          hint: const Text('Kategori seçin'),
+                          items: _categories.map((String category) {
+                            return DropdownMenuItem<String>(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
                         ),
                       ),
-                    )
+                    ),
+                    const SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        // crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          IconButton.filled(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _textController.clear();
+                                descriptionTextController.clear();
+                              },
+                              icon: const Icon(Icons.close)),
+                          IconButton.filled(
+                              onPressed: () {
+                                saveTask();
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.check),
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ));
@@ -244,6 +272,7 @@ class _HomePageState extends State<HomePage> {
               onChanged: (value) => checkBoxChanged(index),
               deleteTask: (context) => deleteTask(todoItems[index]),
               taskDate: todoItems[index].taskDate,
+              taskCategory:todoItems[index].taskCategory ,
             ),
           );
         },
@@ -269,7 +298,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _textController.dispose();
-    _descriptionTextController.dispose();
+    descriptionTextController.dispose();
     super.dispose();
   }
 }
