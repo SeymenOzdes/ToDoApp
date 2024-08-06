@@ -5,6 +5,7 @@ import 'package:first_app/todo_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'adding_todo_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,10 +19,10 @@ class _HomePageState extends State<HomePage> {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   final _textController = TextEditingController();
   final descriptionTextController = TextEditingController();
+  final List<String> _categories = ["Gündelik", "İş", "Okul"];
   DateTime dateTime = DateTime.now();
   List<TodoModel> todoItems = [];
   String _selectedValue = "";
-  final List<String> _categories = ["Gündelik", "İş", "Okul"];
   var log = Logger();
 
   @override
@@ -70,6 +71,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void updateDropdownValue(String value) {
+    setState(() {
+      _selectedValue = value;
+    });
+  }
+
   void checkBoxChanged(int index) async {
     final todo = todoItems[index];
     final updatedTodo = TodoModel(
@@ -108,143 +115,68 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void showDatePickerSheet() {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SizedBox(
-            height: 300,
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: CupertinoDatePicker(
-                      initialDateTime: dateTime,
-                      minimumYear: 2024,
-                      onDateTimeChanged: (DateTime newTime) {
-                        setState(() {
-                          dateTime = newTime;
-                        });
-                      },
-                      mode: CupertinoDatePickerMode.dateAndTime,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showCustomBottomSheet();
-                    },
-                    child: const Text("save"),
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
+  // void showDatePickerSheet() {
+  //   showModalBottomSheet(
+  //       context: context,
+  //       builder: (context) {
+  //         return SizedBox(
+  //           height: 300,
+  //           width: double.infinity,
+  //           child: Padding(
+  //             padding: const EdgeInsets.all(12),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Expanded(
+  //                   child: CupertinoDatePicker(
+  //                     initialDateTime: dateTime,
+  //                     minimumYear: 2024,
+  //                     onDateTimeChanged: (DateTime newTime) {
+  //                       setState(() {
+  //                         dateTime = newTime;
+  //                       });
+  //                     },
+  //                     mode: CupertinoDatePickerMode.dateAndTime,
+  //                   ),
+  //                 ),
+  //                 ElevatedButton(
+  //                   onPressed: () {
+  //                     Navigator.pop(context);
+  //                     showCustomBottomSheet(context);
+  //                   },
+  //                   child: const Text("save"),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         );
+  //       });
+  // }
 
-  void showCustomBottomSheet() {
+  void showCustomBottomSheet(BuildContext context) {
     showModalBottomSheet(
-        context: context,
-        showDragHandle: true,
-        elevation: 0,
-        builder: (context) {
-          return SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: Column(
-                  children: [
-                    TextField(
-                      style: const TextStyle(fontSize: 22),
-                      controller: _textController,
-                      decoration: const InputDecoration(
-                          hintText: "Add a new ToDo",
-                          hintStyle:
-                              TextStyle(fontSize: 22, color: Colors.grey),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none),
-                      keyboardType: TextInputType.name,
-                    ),
-                    TextField(
-                      style: const TextStyle(fontSize: 18),
-                      controller: descriptionTextController,
-                      decoration: const InputDecoration(
-                        hintText: "Description",
-                        hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              showDatePickerSheet();
-                            },
-                            label: const Text("Bitiş Tarihi seç"),
-                            icon: const Icon(Icons.flag),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, top: 12),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: DropdownButton<String>(
-                          value: _categories.contains(_selectedValue)
-                              ? _selectedValue
-                              : null,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedValue = newValue ?? "";
-                            });
-                          },
-                          hint: const Text('Kategori seçin'),
-                          items: _categories.map((String category) {
-                            return DropdownMenuItem<String>(
-                              value: category,
-                              child: Text(category),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton.filled(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _textController.clear();
-                                descriptionTextController.clear();
-                              },
-                              icon: const Icon(Icons.close)),
-                          IconButton.filled(
-                            onPressed: () {
-                              saveTask();
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.check),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ));
-        });
+      context: context,
+      showDragHandle: true,
+      elevation: 0,
+      builder: (context) {
+        return CustomBottomSheet(
+          textController: _textController,
+          descriptionTextController: descriptionTextController,
+          selectedValue: _selectedValue,
+          categories: _categories,
+          onSaveTask: saveTask,
+          onValueChanged: (value) => updateDropdownValue(value ?? ""),
+          onDateSelected: (DateTime newDate) {
+            if (mounted) {
+              setState(() {
+                dateTime = newDate;
+              });
+            }
+          },
+          initialDateTime: dateTime,
+        );
+      },
+    );
   }
 
   @override
@@ -283,7 +215,7 @@ class _HomePageState extends State<HomePage> {
           ),
           FloatingActionButton(
             onPressed: () {
-              showCustomBottomSheet();
+              showCustomBottomSheet(context);
             },
             child: const Icon(Icons.add),
           ),

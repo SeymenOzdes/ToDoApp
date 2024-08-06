@@ -53,7 +53,7 @@ class ToDoItem extends StatelessWidget {
                       taskName,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 20,
                         decoration: taskCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
@@ -65,12 +65,16 @@ class ToDoItem extends StatelessWidget {
                       children: [
                         Text(
                           formatter.format(taskDate),
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18),
                         ),
-                        const SizedBox(width: 16,), 
+                        const SizedBox(
+                          width: 16,
+                        ),
                         Text(
                           taskCategory,
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 18),
                         )
                       ],
                     ),
