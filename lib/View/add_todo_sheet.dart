@@ -9,13 +9,12 @@ class CustomBottomSheet extends StatefulWidget {
   final String selectedCategoryValue;
   final List<String> categories;
   final DateTime initialDateTime;
-  final ViewController controller; // Add this line
-
+  final ViewController controller;
   final Future<void> Function() onSaveTask;
   final void Function(String?) onValueChanged;
   final void Function(DateTime) onDateSelected;
 
-  CustomBottomSheet({
+  const CustomBottomSheet({
     required this.controller,
     required this.textController,
     required this.descriptionTextController,
@@ -28,10 +27,10 @@ class CustomBottomSheet extends StatefulWidget {
   });
 
   @override
-  _CustomBottomSheetState createState() => _CustomBottomSheetState();
+  CustomBottomSheetState createState() => CustomBottomSheetState();
 }
 
-class _CustomBottomSheetState extends State<CustomBottomSheet> {
+class CustomBottomSheetState extends State<CustomBottomSheet> {
   DateTime selectedDateTime = DateTime.now();
   String selectedCategoryValue = "";
   late ViewController _controller;
@@ -43,7 +42,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     super.initState();
     selectedDateTime = widget.initialDateTime;
     selectedCategoryValue = widget.selectedCategoryValue;
-    _controller = widget.controller; // Initialize here
+    _controller = widget.controller;
   }
 
   void showDatePickerSheet() {

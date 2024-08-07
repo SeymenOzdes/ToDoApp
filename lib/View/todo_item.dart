@@ -55,8 +55,21 @@ class ToDoItem extends StatelessWidget {
                     Text(
                       todoModel.taskName,
                       style: TextStyle(
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                         fontSize: 20,
+                        decoration: todoModel.taskCompleted
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        decorationColor: Colors.white,
+                        decorationThickness: 3,
+                      ),
+                    ),
+                    Text(
+                      todoModel.taskDescription,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
                         decoration: todoModel.taskCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
@@ -69,7 +82,7 @@ class ToDoItem extends StatelessWidget {
                         Text(
                           formatter.format(todoModel.taskDate),
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 18),
+                              color: Colors.white, fontSize: 16),
                         ),
                         const SizedBox(
                           width: 16,
@@ -77,7 +90,7 @@ class ToDoItem extends StatelessWidget {
                         Text(
                           todoModel.taskCategory,
                           style: const TextStyle(
-                              color: Colors.white, fontSize: 18),
+                              color: Colors.white, fontSize: 16),
                         )
                       ],
                     ),
