@@ -31,7 +31,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   DateTime selectedDateTime = DateTime.now();
   Logger log = Logger();
   String selectedValue = "";
-  
+
   @override
   void initState() {
     super.initState();
@@ -127,7 +127,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: DropdownButton<String>(
-                  value: selectedValue.isEmpty ? null : selectedValue,
+                  value: selectedValue.isNotEmpty ? selectedValue : null,
                   onChanged: (String? newValue) {
                     widget.onValueChanged(newValue);
                     setState(() {
@@ -150,15 +150,18 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
+                  IconButton.filled(
                     onPressed: () {
                       Navigator.pop(context);
                       widget.textController.clear();
                       widget.descriptionTextController.clear();
+                      setState(() {
+                        selectedValue = "";
+                      });
                     },
                     icon: const Icon(Icons.close),
                   ),
-                  IconButton(
+                  IconButton.filled(
                     onPressed: () async {
                       await widget.onSaveTask();
                       Navigator.pop(context);

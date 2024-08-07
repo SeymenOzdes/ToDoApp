@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:first_app/todo_model.dart';
 import 'package:first_app/database_helper.dart';
 import 'package:first_app/todo_item.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'adding_todo_sheet.dart';
@@ -64,6 +63,8 @@ class _HomePageState extends State<HomePage> {
         await _databaseHelper.insertTodo(todo);
         _textController.clear();
         descriptionTextController.clear();
+        _selectedValue = "";
+        dateTime = DateTime.now();
         await _loadTodos();
       } catch (e) {
         log.e('Error inserting todo: $e');
@@ -71,9 +72,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void updateDropdownValue(String value) {
+  void updateDropdownValue(String? value) {
     setState(() {
-      _selectedValue = value;
+      _selectedValue = value ?? "";
     });
   }
 
@@ -85,8 +86,8 @@ class _HomePageState extends State<HomePage> {
       taskCompleted: !todo.taskCompleted,
       isVisible: true,
       taskDescription: todo.taskDescription,
-      taskDate: dateTime,
-      taskCategory: _selectedValue,
+      taskDate: todo.taskDate,
+      taskCategory: todo.taskCategory,
     );
     await _databaseHelper.updateTodo(updatedTodo);
     await _loadTodos();
@@ -115,44 +116,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // void showDatePickerSheet() {
-  //   showModalBottomSheet(
-  //       context: context,
-  //       builder: (context) {
-  //         return SizedBox(
-  //           height: 300,
-  //           width: double.infinity,
-  //           child: Padding(
-  //             padding: const EdgeInsets.all(12),
-  //             child: Column(
-  //               mainAxisSize: MainAxisSize.min,
-  //               children: [
-  //                 Expanded(
-  //                   child: CupertinoDatePicker(
-  //                     initialDateTime: dateTime,
-  //                     minimumYear: 2024,
-  //                     onDateTimeChanged: (DateTime newTime) {
-  //                       setState(() {
-  //                         dateTime = newTime;
-  //                       });
-  //                     },
-  //                     mode: CupertinoDatePickerMode.dateAndTime,
-  //                   ),
-  //                 ),
-  //                 ElevatedButton(
-  //                   onPressed: () {
-  //                     Navigator.pop(context);
-  //                     showCustomBottomSheet(context);
-  //                   },
-  //                   child: const Text("save"),
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //         );
-  //       });
-  // }
-
   void showCustomBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -165,7 +128,7 @@ class _HomePageState extends State<HomePage> {
           selectedValue: _selectedValue,
           categories: _categories,
           onSaveTask: saveTask,
-          onValueChanged: (value) => updateDropdownValue(value ?? ""),
+          onValueChanged: (value) => updateDropdownValue(value),
           onDateSelected: (DateTime newDate) {
             if (mounted) {
               setState(() {
