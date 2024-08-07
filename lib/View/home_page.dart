@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'package:first_app/Model/todo_model.dart';
 import 'package:first_app/Controller/database_helper.dart';
 import 'package:first_app/View/todo_item.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'add_todo_sheet.dart';
+import 'package:first_app/Controller/view_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,105 +14,32 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late final ViewController _controller;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final _textController = TextEditingController();
-  final descriptionTextController = TextEditingController();
   final List<String> _categories = ["Gündelik", "İş", "Okul"];
-  DateTime dateTime = DateTime.now();
-  List<TodoModel> todoItems = [];
-  String _selectedCategoryValue = "";
-  var log = Logger();
 
   @override
   void initState() {
     super.initState();
+    _controller = ViewController(
+      onTodosLoaded: (todos) {
+        if (mounted) {
+          setState(() {
+            _controller.todoItems = todos;
+          });
+        }
+      },
+    );
+
+    _controller.loadTodos();
+
     Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
 
-      if (todoItems.isEmpty) {
+      if (_controller.todoItems.isEmpty) {
         timer.cancel();
       }
     });
-    _loadTodos();
-  }
-
-  Future<void> _loadTodos() async {
-    final todos = await _databaseHelper.getTodos();
-
-    setState(() {
-      todoItems = todos;
-    });
-  }
-
-  Future<void> saveTask() async {
-    if (_textController.text.isNotEmpty &&
-        descriptionTextController.text.isNotEmpty) {
-      final todo = TodoModel(
-        id: null,
-        taskName: _textController.text,
-        taskCompleted: false,
-        isVisible: true, // ekledim
-        taskDescription: descriptionTextController.text,
-        taskDate: dateTime,
-        taskCategory: _selectedCategoryValue,
-      );
-      try {
-        log.i(todoItems.indexed);
-
-        await _databaseHelper.insertTodo(todo);
-        _textController.clear();
-        descriptionTextController.clear();
-        _selectedCategoryValue = "";
-        dateTime = DateTime.now();
-        await _loadTodos();
-      } catch (e) {
-        log.e('Error inserting todo: $e');
-      }
-    }
-  }
-
-  void updateDropdownValue(String? value) {
-    setState(() {
-      _selectedCategoryValue = value ?? "";
-    });
-  }
-
-  void checkBoxChanged(int index) async {
-    final todo = todoItems[index];
-    final updatedTodo = TodoModel(
-      id: todo.id,
-      taskName: todo.taskName,
-      taskCompleted: !todo.taskCompleted,
-      isVisible: true,
-      taskDescription: todo.taskDescription,
-      taskDate: todo.taskDate,
-      taskCategory: todo.taskCategory,
-    );
-    await _databaseHelper.updateTodo(updatedTodo);
-    await _loadTodos();
-
-    await Future.delayed(const Duration(seconds: 1));
-    await deleteTask(todo);
-    await _loadTodos();
-    setState(() {});
-  }
-
-  Future<void> deleteTask(TodoModel todo) async {
-    final updatedTodo = TodoModel(
-        id: todo.id,
-        taskName: todo.taskName,
-        taskCompleted: todo.taskCompleted,
-        isVisible: false,
-        taskDescription: todo.taskDescription,
-        taskDate: todo.taskDate,
-        taskCategory: todo.taskCategory);
-
-    await _databaseHelper.updateTodo(updatedTodo);
-
-    final index = todoItems.indexWhere((item) => item.id == todo.id);
-    if (index != -1) {
-      todoItems[index] = updatedTodo;
-    }
   }
 
   void showCustomBottomSheet(BuildContext context) {
@@ -123,20 +49,23 @@ class _HomePageState extends State<HomePage> {
       elevation: 0,
       builder: (context) {
         return CustomBottomSheet(
-          textController: _textController,
-          descriptionTextController: descriptionTextController,
-          selectedCategoryValue: _selectedCategoryValue,
+          textController: _controller.textController,
+          descriptionTextController: _controller.descriptionTextController,
+          selectedCategoryValue: _controller.selectedCategoryValue,
           categories: _categories,
-          onSaveTask: saveTask,
-          onValueChanged: (value) => updateDropdownValue(value),
+          onSaveTask: _controller.saveTask,
+          onValueChanged: (value) {
+            _controller.updateDropdownValue(value);
+            setState(() {});
+          },
           onDateSelected: (DateTime newDate) {
             if (mounted) {
               setState(() {
-                dateTime = newDate;
+                _controller.dateTime = newDate;
               });
             }
           },
-          initialDateTime: dateTime,
+          initialDateTime: _controller.dateTime,
         );
       },
     );
@@ -154,17 +83,27 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color.fromARGB(255, 138, 20, 189),
       ),
       body: ListView.builder(
-        itemCount: todoItems.length,
+        itemCount: _controller.todoItems.length,
         itemBuilder: (BuildContext context, index) {
           return Visibility(
-            visible: todoItems[index].isVisible,
+            visible: _controller.todoItems[index].isVisible,
             child: ToDoItem(
-              taskName: todoItems[index].taskName,
-              taskCompleted: todoItems[index].taskCompleted,
-              onChanged: (value) => checkBoxChanged(index),
-              deleteTask: (context) => deleteTask(todoItems[index]),
-              taskDate: todoItems[index].taskDate,
-              taskCategory: todoItems[index].taskCategory,
+              taskName: _controller.todoItems[index].taskName,
+              taskCompleted: _controller.todoItems[index].taskCompleted,
+              onChanged: (value) {
+                _controller.checkBoxChanged(index);
+                if (mounted) {
+                  setState(() {});
+                }
+              },
+              deleteTask: (context) async {
+                await _controller.deleteTask(_controller.todoItems[index]);
+                if (mounted) {
+                  setState(() {});
+                }
+              },
+              taskDate: _controller.todoItems[index].taskDate,
+              taskCategory: _controller.todoItems[index].taskCategory,
             ),
           );
         },
@@ -189,8 +128,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    _textController.dispose();
-    descriptionTextController.dispose();
+    _controller.textController.dispose();
+    _controller.descriptionTextController.dispose();
     super.dispose();
   }
 }
