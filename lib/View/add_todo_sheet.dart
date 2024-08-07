@@ -5,7 +5,7 @@ import 'package:logger/web.dart';
 class CustomBottomSheet extends StatefulWidget {
   final TextEditingController textController;
   final TextEditingController descriptionTextController;
-  final String selectedValue;
+  final String selectedCategoryValue;
   final List<String> categories;
   final Future<void> Function() onSaveTask;
   final void Function(String?) onValueChanged;
@@ -15,7 +15,7 @@ class CustomBottomSheet extends StatefulWidget {
   CustomBottomSheet({
     required this.textController,
     required this.descriptionTextController,
-    required this.selectedValue,
+    required this.selectedCategoryValue,
     required this.categories,
     required this.onSaveTask,
     required this.onValueChanged,
@@ -29,14 +29,14 @@ class CustomBottomSheet extends StatefulWidget {
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
   DateTime selectedDateTime = DateTime.now();
+  String selectedCategoryValue = "";
   Logger log = Logger();
-  String selectedValue = "";
-
+                        
   @override
   void initState() {
     super.initState();
     selectedDateTime = widget.initialDateTime;
-    selectedValue = widget.selectedValue;
+    selectedCategoryValue = widget.selectedCategoryValue;
   }
 
   void showDatePickerSheet() {
@@ -80,7 +80,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.selectedValue);
+    print(widget.selectedCategoryValue);
 
     return SizedBox(
       height: 300,
@@ -127,11 +127,13 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: DropdownButton<String>(
-                  value: selectedValue.isNotEmpty ? selectedValue : null,
+                  value: selectedCategoryValue.isNotEmpty
+                      ? selectedCategoryValue
+                      : null,
                   onChanged: (String? newValue) {
                     widget.onValueChanged(newValue);
                     setState(() {
-                      selectedValue = newValue ?? "";
+                      selectedCategoryValue = newValue ?? "";
                     });
                   },
                   hint: const Text('Select Category'),
@@ -156,7 +158,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                       widget.textController.clear();
                       widget.descriptionTextController.clear();
                       setState(() {
-                        selectedValue = "";
+                        selectedCategoryValue = "";
                       });
                     },
                     icon: const Icon(Icons.close),

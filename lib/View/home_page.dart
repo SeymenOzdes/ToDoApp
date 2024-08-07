@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:first_app/todo_model.dart';
-import 'package:first_app/database_helper.dart';
-import 'package:first_app/todo_item.dart';
+import 'package:first_app/Model/todo_model.dart';
+import 'package:first_app/Controller/database_helper.dart';
+import 'package:first_app/View/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'adding_todo_sheet.dart';
+import 'add_todo_sheet.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   final List<String> _categories = ["Gündelik", "İş", "Okul"];
   DateTime dateTime = DateTime.now();
   List<TodoModel> todoItems = [];
-  String _selectedValue = "";
+  String _selectedCategoryValue = "";
   var log = Logger();
 
   @override
@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         isVisible: true, // ekledim
         taskDescription: descriptionTextController.text,
         taskDate: dateTime,
-        taskCategory: _selectedValue,
+        taskCategory: _selectedCategoryValue,
       );
       try {
         log.i(todoItems.indexed);
@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         await _databaseHelper.insertTodo(todo);
         _textController.clear();
         descriptionTextController.clear();
-        _selectedValue = "";
+        _selectedCategoryValue = "";
         dateTime = DateTime.now();
         await _loadTodos();
       } catch (e) {
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
 
   void updateDropdownValue(String? value) {
     setState(() {
-      _selectedValue = value ?? "";
+      _selectedCategoryValue = value ?? "";
     });
   }
 
@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
         return CustomBottomSheet(
           textController: _textController,
           descriptionTextController: descriptionTextController,
-          selectedValue: _selectedValue,
+          selectedCategoryValue: _selectedCategoryValue,
           categories: _categories,
           onSaveTask: saveTask,
           onValueChanged: (value) => updateDropdownValue(value),
