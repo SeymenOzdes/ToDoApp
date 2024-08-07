@@ -1,23 +1,26 @@
+import 'package:first_app/Model/todo_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 class ToDoItem extends StatelessWidget {
-  final String taskName;
-  final bool taskCompleted;
+  // final String taskName;
+  // final bool taskCompleted;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteTask;
-  final DateTime taskDate;
-  final String taskCategory;
+  final TodoModel todoModel;
+  // final DateTime taskDate;
+  // final String taskCategory;
 
   const ToDoItem({
     super.key,
-    required this.taskName,
-    required this.taskCompleted,
+    // required this.taskName,
+    // required this.taskCompleted,
+    required this.todoModel,
     required this.onChanged,
     required this.deleteTask,
-    required this.taskDate,
-    required this.taskCategory,
+    // required this.taskDate,
+    // required this.taskCategory,
   });
 
   @override
@@ -42,7 +45,7 @@ class ToDoItem extends StatelessWidget {
             child: Row(
               children: [
                 Checkbox(
-                  value: taskCompleted,
+                  value: todoModel.taskCompleted,
                   onChanged: onChanged,
                   side: const BorderSide(color: Colors.white),
                 ),
@@ -50,11 +53,11 @@ class ToDoItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      taskName,
+                      todoModel.taskName,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
-                        decoration: taskCompleted
+                        decoration: todoModel.taskCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
                         decorationColor: Colors.white,
@@ -64,7 +67,7 @@ class ToDoItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          formatter.format(taskDate),
+                          formatter.format(todoModel.taskDate),
                           style: const TextStyle(
                               color: Colors.white, fontSize: 18),
                         ),
@@ -72,7 +75,7 @@ class ToDoItem extends StatelessWidget {
                           width: 16,
                         ),
                         Text(
-                          taskCategory,
+                          todoModel.taskCategory,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 18),
                         )

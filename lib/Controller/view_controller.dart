@@ -5,12 +5,14 @@ import 'package:logger/logger.dart';
 
 class ViewController {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  List<TodoModel> todoItems = [];
   final void Function(List<TodoModel>) onTodosLoaded;
   final _textController = TextEditingController();
   final _descriptionTextController = TextEditingController();
   String _selectedCategoryValue = "";
   DateTime dateTime = DateTime.now();
+  final List<String> _categories = ["Gündelik", "İş", "Okul"];
+  List<TodoModel> todoItems = [];
+
   var log = Logger();
 
   ViewController({
@@ -19,7 +21,6 @@ class ViewController {
 
   TextEditingController get textController => _textController;
 
-  // Getter for descriptionTextController
   TextEditingController get descriptionTextController =>
       _descriptionTextController;
 
@@ -27,6 +28,8 @@ class ViewController {
   set selectedCategoryValue(String value) {
     _selectedCategoryValue = value;
   }
+
+  List<String> get categories => _categories;
 
   Future<void> loadTodos() async {
     final todos = await _databaseHelper.getTodos();
@@ -49,10 +52,7 @@ class ViewController {
         log.i(todoItems.indexed);
 
         await _databaseHelper.insertTodo(todo);
-        _textController.clear();
-        _descriptionTextController.clear();
-        _selectedCategoryValue = "";
-        dateTime = DateTime.now();
+        clearAddingTodoFields();
         await loadTodos();
       } catch (e) {
         log.e('Error inserting todo: $e');
@@ -100,5 +100,12 @@ class ViewController {
 
   void updateDropdownValue(String? value) {
     selectedCategoryValue = value ?? "";
+  }
+
+  void clearAddingTodoFields() {
+    _textController.clear();
+    _descriptionTextController.clear();
+    _selectedCategoryValue = "";
+    dateTime = DateTime.now();
   }
 }

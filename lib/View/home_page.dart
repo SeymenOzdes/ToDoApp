@@ -16,7 +16,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final ViewController _controller;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final List<String> _categories = ["Gündelik", "İş", "Okul"];
 
   @override
   void initState() {
@@ -49,10 +48,11 @@ class _HomePageState extends State<HomePage> {
       elevation: 0,
       builder: (context) {
         return CustomBottomSheet(
+          controller: _controller,
           textController: _controller.textController,
           descriptionTextController: _controller.descriptionTextController,
           selectedCategoryValue: _controller.selectedCategoryValue,
-          categories: _categories,
+          categories: _controller.categories,
           onSaveTask: _controller.saveTask,
           onValueChanged: (value) {
             _controller.updateDropdownValue(value);
@@ -88,8 +88,9 @@ class _HomePageState extends State<HomePage> {
           return Visibility(
             visible: _controller.todoItems[index].isVisible,
             child: ToDoItem(
-              taskName: _controller.todoItems[index].taskName,
-              taskCompleted: _controller.todoItems[index].taskCompleted,
+              todoModel: _controller.todoItems[index],
+              // taskName: _controller.todoItems[index].taskName,
+              // taskCompleted: _controller.todoItems[index].taskCompleted,
               onChanged: (value) {
                 _controller.checkBoxChanged(index);
                 if (mounted) {
@@ -102,8 +103,8 @@ class _HomePageState extends State<HomePage> {
                   setState(() {});
                 }
               },
-              taskDate: _controller.todoItems[index].taskDate,
-              taskCategory: _controller.todoItems[index].taskCategory,
+              // taskDate: _controller.todoItems[index].taskDate,
+              // taskCategory: _controller.todoItems[index].taskCategory,
             ),
           );
         },

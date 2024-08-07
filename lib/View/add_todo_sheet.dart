@@ -1,3 +1,4 @@
+import 'package:first_app/Controller/view_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
@@ -7,12 +8,15 @@ class CustomBottomSheet extends StatefulWidget {
   final TextEditingController descriptionTextController;
   final String selectedCategoryValue;
   final List<String> categories;
+  final DateTime initialDateTime;
+  final ViewController controller; // Add this line
+
   final Future<void> Function() onSaveTask;
   final void Function(String?) onValueChanged;
   final void Function(DateTime) onDateSelected;
-  final DateTime initialDateTime;
 
   CustomBottomSheet({
+    required this.controller,
     required this.textController,
     required this.descriptionTextController,
     required this.selectedCategoryValue,
@@ -30,13 +34,16 @@ class CustomBottomSheet extends StatefulWidget {
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
   DateTime selectedDateTime = DateTime.now();
   String selectedCategoryValue = "";
+  late ViewController _controller;
+
   Logger log = Logger();
-                        
+
   @override
   void initState() {
     super.initState();
     selectedDateTime = widget.initialDateTime;
     selectedCategoryValue = widget.selectedCategoryValue;
+    _controller = widget.controller; // Initialize here
   }
 
   void showDatePickerSheet() {
@@ -80,8 +87,6 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.selectedCategoryValue);
-
     return SizedBox(
       height: 300,
       width: double.infinity,
@@ -155,10 +160,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                   IconButton.filled(
                     onPressed: () {
                       Navigator.pop(context);
-                      widget.textController.clear();
-                      widget.descriptionTextController.clear();
                       setState(() {
-                        selectedCategoryValue = "";
+                        _controller.clearAddingTodoFields();
                       });
                     },
                     icon: const Icon(Icons.close),
