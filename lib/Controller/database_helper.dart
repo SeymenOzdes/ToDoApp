@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../Model/todo_model.dart';
@@ -61,7 +60,7 @@ class DatabaseHelper {
   }
 
   Future<List<TodoModel>> getTodos() async {
-    await Future.delayed(const Duration(milliseconds: 1000)); // delay
+    await Future.delayed(const Duration(milliseconds: 750)); // delay
 
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('todos');

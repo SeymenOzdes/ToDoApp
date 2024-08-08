@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:first_app/Controller/database_helper.dart';
 import 'package:first_app/Model/todo_model.dart';
+import 'package:first_app/View/loading_indicator.dart';
 import 'package:first_app/View/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'add_todo_sheet.dart';
@@ -17,10 +18,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final ViewController _controller;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
+  late final Future<List<TodoModel>> _todosFuture;
+  // final LoadingIndicator _loadingIndicator = LoadingIndicator();
 
   @override
   void initState() {
     super.initState();
+    _todosFuture = _databaseHelper.getTodos();
+
     _controller = ViewController(
       onTodosLoaded: (todos) {
         if (mounted) {
@@ -87,20 +92,21 @@ class _HomePageState extends State<HomePage> {
         future: _databaseHelper.getTodos(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No todos found.'));
           } else {
-            _controller.todoItems = snapshot.data!;
+            final todos = snapshot.data!;
             return ListView.builder(
-              itemCount: _controller.todoItems.length,
+              itemCount: todos.length,
               itemBuilder: (BuildContext context, index) {
+                final todo = todos[index];
                 return Visibility(
-                  visible: _controller.todoItems[index].isVisible,
+                  visible: todo.isVisible,
                   child: ToDoItem(
-                    todoModel: _controller.todoItems[index],
+                    todoModel: todo,
                     onChanged: (value) {
                       _controller.checkBoxChanged(index);
                       if (mounted) {
@@ -108,8 +114,7 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                     deleteTask: (context) async {
-                      await _controller
-                          .deleteTask(_controller.todoItems[index]);
+                      await _controller.deleteTask(todo);
                       if (mounted) {
                         setState(() {});
                       }
