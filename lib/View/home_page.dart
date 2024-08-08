@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:first_app/Controller/database_helper.dart';
+import 'package:first_app/Model/todo_model.dart';
 import 'package:first_app/View/todo_item.dart';
 import 'package:flutter/material.dart';
 import 'add_todo_sheet.dart';
@@ -30,7 +31,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    _controller.loadTodos();
+    // _controller.loadTodos();
 
     Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
@@ -82,31 +83,42 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: const Color.fromARGB(255, 138, 20, 189),
       ),
-      body: ListView.builder(
-        itemCount: _controller.todoItems.length,
-        itemBuilder: (BuildContext context, index) {
-          return Visibility(
-            visible: _controller.todoItems[index].isVisible,
-            child: ToDoItem(
-              todoModel: _controller.todoItems[index],
-              // taskName: _controller.todoItems[index].taskName,
-              // taskCompleted: _controller.todoItems[index].taskCompleted,
-              onChanged: (value) {
-                _controller.checkBoxChanged(index);
-                if (mounted) {
-                  setState(() {});
-                }
+      body: FutureBuilder<List<TodoModel>>(
+        future: _databaseHelper.getTodos(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No todos found.'));
+          } else {
+            _controller.todoItems = snapshot.data!;
+            return ListView.builder(
+              itemCount: _controller.todoItems.length,
+              itemBuilder: (BuildContext context, index) {
+                return Visibility(
+                  visible: _controller.todoItems[index].isVisible,
+                  child: ToDoItem(
+                    todoModel: _controller.todoItems[index],
+                    onChanged: (value) {
+                      _controller.checkBoxChanged(index);
+                      if (mounted) {
+                        setState(() {});
+                      }
+                    },
+                    deleteTask: (context) async {
+                      await _controller
+                          .deleteTask(_controller.todoItems[index]);
+                      if (mounted) {
+                        setState(() {});
+                      }
+                    },
+                  ),
+                );
               },
-              deleteTask: (context) async {
-                await _controller.deleteTask(_controller.todoItems[index]);
-                if (mounted) {
-                  setState(() {});
-                }
-              },
-              // taskDate: _controller.todoItems[index].taskDate,
-              // taskCategory: _controller.todoItems[index].taskCategory,
-            ),
-          );
+            );
+          }
         },
       ),
       floatingActionButton: Row(

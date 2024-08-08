@@ -4,21 +4,21 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 class ToDoItem extends StatelessWidget {
-  // final String taskName;
-  // final bool taskCompleted;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? deleteTask;
   final TodoModel todoModel;
+  // final String taskName;
+  // final bool taskCompleted;
   // final DateTime taskDate;
   // final String taskCategory;
 
   const ToDoItem({
     super.key,
-    // required this.taskName,
-    // required this.taskCompleted,
     required this.todoModel,
     required this.onChanged,
     required this.deleteTask,
+    // required this.taskName,
+    // required this.taskCompleted,
     // required this.taskDate,
     // required this.taskCategory,
   });
@@ -67,12 +67,9 @@ class ToDoItem extends StatelessWidget {
                     ),
                     Text(
                       todoModel.taskDescription,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
-                        decoration: todoModel.taskCompleted
-                            ? TextDecoration.lineThrough
-                            : TextDecoration.none,
+                        fontSize: 14,
                         decorationColor: Colors.white,
                         decorationThickness: 3,
                       ),

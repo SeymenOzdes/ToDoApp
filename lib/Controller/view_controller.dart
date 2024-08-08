@@ -25,6 +25,7 @@ class ViewController {
       _descriptionTextController;
 
   String get selectedCategoryValue => _selectedCategoryValue;
+
   set selectedCategoryValue(String value) {
     _selectedCategoryValue = value;
   }
@@ -107,5 +108,9 @@ class ViewController {
     _descriptionTextController.clear();
     _selectedCategoryValue = "";
     dateTime = DateTime.now();
+  }
+
+  void deleteDatabaseFile() async {
+    await _databaseHelper.deleteDatabaseFile();
   }
 }
