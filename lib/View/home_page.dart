@@ -18,23 +18,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final ViewController _controller;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  late final Future<List<TodoModel>> _todosFuture;
-  // final LoadingIndicator _loadingIndicator = LoadingIndicator();
+  late final Future<void> _initHomePage;
 
   @override
   void initState() {
     super.initState();
-    _todosFuture = _databaseHelper.getTodos();
+    _initHomePage = initHomePage();
 
-    _controller = ViewController(
-      onTodosLoaded: (todos) {
-        if (mounted) {
-          setState(() {
-            _controller.todoItems = todos;
-          });
-        }
-      },
-    );
+    _controller = ViewController(onTodosLoaded: refresh);
 
     // _controller.loadTodos();
 
@@ -44,6 +35,12 @@ class _HomePageState extends State<HomePage> {
       if (_controller.todoItems.isEmpty) {
         timer.cancel();
       }
+    });
+  }
+
+  void refresh() {
+    setState(() {
+      print("refrehlendi");
     });
   }
 
@@ -77,6 +74,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> initHomePage() async {
+    final tempList = await _databaseHelper.getTodos();
+    setState(() {
+      _controller.todoItems = tempList;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,21 +92,18 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: const Color.fromARGB(255, 138, 20, 189),
       ),
-      body: FutureBuilder<List<TodoModel>>(
-        future: _databaseHelper.getTodos(),
+      body: FutureBuilder<void>(
+        future: _initHomePage,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: LoadingIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No todos found.'));
           } else {
-            final todos = snapshot.data!;
             return ListView.builder(
-              itemCount: todos.length,
+              itemCount: _controller.todoItems.length,
               itemBuilder: (BuildContext context, index) {
-                final todo = todos[index];
+                final todo = _controller.todoItems[index];
                 return Visibility(
                   visible: todo.isVisible,
                   child: ToDoItem(

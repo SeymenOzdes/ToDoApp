@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 
 class ViewController {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final void Function(List<TodoModel>) onTodosLoaded;
+  final void Function() onTodosLoaded;
   final _textController = TextEditingController();
   final _descriptionTextController = TextEditingController();
   String _selectedCategoryValue = "";
@@ -34,7 +34,8 @@ class ViewController {
 
   Future<void> loadTodos() async {
     final todos = await _databaseHelper.getTodos();
-    onTodosLoaded(todos);
+    todoItems = todos;
+    onTodosLoaded();
   }
 
   Future<void> saveTask() async {
