@@ -1,4 +1,5 @@
 import 'package:first_app/Controller/view_controller.dart';
+import 'package:first_app/Repository/todos_repo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/web.dart';
@@ -9,13 +10,11 @@ class CustomBottomSheet extends StatefulWidget {
   final String selectedCategoryValue;
   final List<String> categories;
   final DateTime initialDateTime;
-  final ViewController controller;
   final Future<void> Function() onSaveTask;
   final void Function(String?) onValueChanged;
   final void Function(DateTime) onDateSelected;
 
   const CustomBottomSheet({
-    required this.controller,
     required this.textController,
     required this.descriptionTextController,
     required this.selectedCategoryValue,
@@ -33,7 +32,7 @@ class CustomBottomSheet extends StatefulWidget {
 class CustomBottomSheetState extends State<CustomBottomSheet> {
   DateTime selectedDateTime = DateTime.now();
   String selectedCategoryValue = "";
-  late ViewController _controller;
+  // late ViewController _controller;
 
   Logger log = Logger();
 
@@ -42,7 +41,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
     super.initState();
     selectedDateTime = widget.initialDateTime;
     selectedCategoryValue = widget.selectedCategoryValue;
-    _controller = widget.controller;
+    // _controller = widget.controller;
   }
 
   void showDatePickerSheet() {
@@ -160,7 +159,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                     onPressed: () {
                       Navigator.pop(context);
                       setState(() {
-                        _controller.clearAddingTodoFields();
+                        // _controller.clearAddingTodoFields();
                       });
                     },
                     icon: const Icon(Icons.close),
