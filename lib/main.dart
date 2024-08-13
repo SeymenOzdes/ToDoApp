@@ -19,7 +19,6 @@ class Home extends StatelessWidget {
         title: "Home Page",
         theme: ThemeData(
             scaffoldBackgroundColor: const Color.fromARGB(255, 162, 101, 226)),
-        home: BlocProvider(
-            create: (context) => TodosCubit(), child: const HomePage()));
+        home: const HomePage());
   }
 }

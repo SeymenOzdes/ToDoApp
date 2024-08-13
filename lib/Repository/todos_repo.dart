@@ -6,31 +6,29 @@ import 'package:logger/web.dart';
 class TodosRepo {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   final void Function() onTodosLoaded;
-  final _textController = TextEditingController();
-  final _descriptionTextController = TextEditingController();
-  String _selectedCategoryValue = "";
-  DateTime dateTime = DateTime.now();
+  // final _textController = TextEditingController();
+  // final _descriptionTextController = TextEditingController();
+  // String _selectedCategoryValue = "";
+  // DateTime dateTime = DateTime.now();
   final List<String> _categories = ["Gündelik", "İş", "Okul"];
   List<TodoModel> todoItems = [];
-
   var log = Logger();
 
   TodosRepo({
     required this.onTodosLoaded,
   });
 
-  TextEditingController get textController => _textController;
+  // TextEditingController get textController => _textController;
+  // TextEditingController get descriptionTextController =>
+  //     _descriptionTextController;
 
-  TextEditingController get descriptionTextController =>
-      _descriptionTextController;
+  // String get selectedCategoryValue => _selectedCategoryValue;
 
-  String get selectedCategoryValue => _selectedCategoryValue;
+  // TextEditingController? get textEditingController => null;
 
-  TextEditingController? get textEditingController => null;
-
-  set selectedCategoryValue(String value) {
-    _selectedCategoryValue = value;
-  }
+  // set selectedCategoryValue(String value) {
+  //   _selectedCategoryValue = value;
+  // }
 
   List<String> get categories => _categories;
 
@@ -41,23 +39,28 @@ class TodosRepo {
     return todoItems;
   }
 
-  Future<void> saveTask() async {
-    if (_textController.text.isNotEmpty &&
-        _descriptionTextController.text.isNotEmpty) {
+  Future<void> saveTask(
+      TextEditingController textController,
+      TextEditingController descriptionTextController,
+      String selectedCategoryValue,
+      DateTime dateTime) async {
+    if (textController.text.isNotEmpty &&
+        descriptionTextController.text.isNotEmpty) {
       final todo = TodoModel(
         id: null,
-        taskName: _textController.text,
+        taskName: textController.text,
         taskCompleted: false,
-        isVisible: true, // ekledim
-        taskDescription: _descriptionTextController.text,
+        isVisible: true,
+        taskDescription: descriptionTextController.text,
         taskDate: dateTime,
-        taskCategory: _selectedCategoryValue,
+        taskCategory: selectedCategoryValue,
       );
       try {
         log.i(todoItems.indexed);
 
         await _databaseHelper.insertTodo(todo);
-        clearAddingTodoFields();
+        clearAddingTodoFields(textController, descriptionTextController,
+            selectedCategoryValue, dateTime);
         await loadTodos();
       } catch (e) {
         log.e('Error inserting todo: $e');
@@ -80,7 +83,7 @@ class TodosRepo {
     await loadTodos();
 
     await Future.delayed(const Duration(seconds: 1));
-    await deleteTask(todo);
+    // await deleteTask(todo);
     await loadTodos();
     // setState(() {});
   }
@@ -103,14 +106,18 @@ class TodosRepo {
     }
   }
 
-  void updateDropdownValue(String? value) {
-    _selectedCategoryValue = value ?? "";
+  void updateDropdownValue(String? value, String selectedCategoryValue) {
+    selectedCategoryValue = value ?? "";
   }
 
-  void clearAddingTodoFields() {
-    _textController.clear();
-    _descriptionTextController.clear();
-    _selectedCategoryValue = "";
+  void clearAddingTodoFields(
+      TextEditingController textController,
+      TextEditingController descriptionTextController,
+      String selectedCategoryValue,
+      DateTime dateTime) {
+    textController.clear();
+    descriptionTextController.clear();
+    selectedCategoryValue = "";
     dateTime = DateTime.now();
   }
 }

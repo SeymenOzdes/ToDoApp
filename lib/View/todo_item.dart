@@ -1,12 +1,15 @@
 import 'package:first_app/Model/todo_model.dart';
+import 'package:first_app/cubits/todos_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 class ToDoItem extends StatelessWidget {
-  final Function(bool?)? onChanged;
-  final Function(BuildContext)? deleteTask;
+  // final Function(bool?)? onChanged;
+  // final Function(BuildContext) deleteTask;
   final TodoModel todoModel;
+  final TodosCubit todoCubit;
   // final String taskName;
   // final bool taskCompleted;
   // final DateTime taskDate;
@@ -15,8 +18,10 @@ class ToDoItem extends StatelessWidget {
   const ToDoItem({
     super.key,
     required this.todoModel,
-    required this.onChanged,
-    required this.deleteTask,
+    required this.todoCubit,
+
+    // required this.onChanged,
+    // required this.deleteTask,
     // required this.taskName,
     // required this.taskCompleted,
     // required this.taskDate,
@@ -32,7 +37,9 @@ class ToDoItem extends StatelessWidget {
       child: Slidable(
         startActionPane: ActionPane(motion: const StretchMotion(), children: [
           SlidableAction(
-            onPressed: deleteTask,
+            onPressed: (value) async {
+              await todoCubit.deleteTask(todoModel);
+            },
             icon: Icons.delete,
             backgroundColor: Colors.red,
           )
@@ -46,7 +53,9 @@ class ToDoItem extends StatelessWidget {
               children: [
                 Checkbox(
                   value: todoModel.taskCompleted,
-                  onChanged: onChanged,
+                  onChanged: (value) async {
+                    await todoCubit.deleteTask(todoModel);
+                  },
                   side: const BorderSide(color: Colors.white),
                 ),
                 Column(

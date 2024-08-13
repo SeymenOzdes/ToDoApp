@@ -1,47 +1,61 @@
-import 'package:first_app/Controller/view_controller.dart';
-import 'package:first_app/Repository/todos_repo.dart';
+// import 'package:first_app/Controller/view_controller.dart';
+// import 'package:first_app/Repository/todos_repo.dart';
+import 'package:first_app/cubits/todos_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:logger/web.dart';
 
 class CustomBottomSheet extends StatefulWidget {
-  final TextEditingController textController;
-  final TextEditingController descriptionTextController;
-  final String selectedCategoryValue;
-  final List<String> categories;
-  final DateTime initialDateTime;
-  final Future<void> Function() onSaveTask;
-  final void Function(String?) onValueChanged;
-  final void Function(DateTime) onDateSelected;
+  // final TextEditingController textController;
+  // final TextEditingController descriptionTextController;
+  // final String selectedCategoryValue;
+  // final List<String> categories;
+  // final DateTime initialDateTime;
+  // final Future<void> Function() onSaveTask;
+  // final void Function(String?) onValueChanged;
 
-  const CustomBottomSheet({
-    required this.textController,
-    required this.descriptionTextController,
-    required this.selectedCategoryValue,
-    required this.categories,
-    required this.onSaveTask,
-    required this.onValueChanged,
-    required this.onDateSelected,
-    required this.initialDateTime,
-  });
+  // final void Function(DateTime) onDateSelected;
+
+  // CustomBottomSheet({
+  //   // required this.textController,
+  //   // required this.descriptionTextController,
+  //   // required this.selectedCategoryValue,
+  //   // required this.categories,
+  //   // required this.onSaveTask,
+  //   // required this.onValueChanged,
+  //   // required this.onDateSelected,
+  //   // required this.initialDateTime,
+  // });
+
+  // ignore: recursive_getters
+  List<String> get categories => categories;
 
   @override
   CustomBottomSheetState createState() => CustomBottomSheetState();
 }
 
 class CustomBottomSheetState extends State<CustomBottomSheet> {
-  DateTime selectedDateTime = DateTime.now();
-  String selectedCategoryValue = "";
-  // late ViewController _controller;
-
+  // DateTime selectedDateTime = DateTime.now();
+  late String selectedCategoryValue;
+  late TextEditingController textController;
+  late TextEditingController descriptionTextController;
+  late final TodosCubit _todosCubit;
+  late final List<String> categories;
+  late DateTime initialDateTime;
+  late DateTime dateTime;
   Logger log = Logger();
 
   @override
   void initState() {
     super.initState();
-    selectedDateTime = widget.initialDateTime;
-    selectedCategoryValue = widget.selectedCategoryValue;
-    // _controller = widget.controller;
+    textController = TextEditingController();
+    descriptionTextController = TextEditingController();
+    selectedCategoryValue = "";
+    categories = ["Gündelik", "İş", "Okul"];
+    initialDateTime = DateTime.now();
+    dateTime = DateTime.now();
+    _todosCubit = TodosCubit();
   }
 
   void showDatePickerSheet() {
@@ -58,11 +72,11 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
               children: [
                 Expanded(
                   child: CupertinoDatePicker(
-                    initialDateTime: selectedDateTime,
+                    initialDateTime: initialDateTime,
                     minimumYear: 2024,
                     onDateTimeChanged: (DateTime newTime) {
                       setState(() {
-                        selectedDateTime = newTime;
+                        initialDateTime = newTime;
                       });
                     },
                     mode: CupertinoDatePickerMode.dateAndTime,
@@ -71,7 +85,9 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    widget.onDateSelected(selectedDateTime);
+                    setState(() {
+                      dateTime = initialDateTime;
+                    });
                   },
                   child: const Text("Save"),
                 )
@@ -94,7 +110,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
           children: [
             TextField(
               style: const TextStyle(fontSize: 22),
-              controller: widget.textController,
+              controller: textController,
               decoration: const InputDecoration(
                 hintText: "Add a new ToDo",
                 hintStyle: TextStyle(fontSize: 22, color: Colors.grey),
@@ -105,7 +121,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
             ),
             TextField(
               style: const TextStyle(fontSize: 18),
-              controller: widget.descriptionTextController,
+              controller: descriptionTextController,
               decoration: const InputDecoration(
                 hintText: "Description",
                 hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
@@ -130,17 +146,20 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: DropdownButton<String>(
-                  value: selectedCategoryValue.isNotEmpty
+                  value: selectedCategoryValue.isNotEmpty // burdan emin değilim
                       ? selectedCategoryValue
                       : null,
                   onChanged: (String? newValue) {
-                    widget.onValueChanged(newValue);
+                    // onValueChanged(newValue);
+                    _todosCubit.updateDropdownValue(newValue,
+                        selectedCategoryValue); // OnValueChanged değişicek.
+
                     setState(() {
                       selectedCategoryValue = newValue ?? "";
                     });
                   },
                   hint: const Text('Select Category'),
-                  items: widget.categories.map((String category) {
+                  items: categories.map((String category) {
                     return DropdownMenuItem<String>(
                       value: category,
                       child: Text(category),
@@ -158,15 +177,18 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                   IconButton.filled(
                     onPressed: () {
                       Navigator.pop(context);
-                      setState(() {
-                        // _controller.clearAddingTodoFields();
-                      });
+                      setState(() {});
                     },
                     icon: const Icon(Icons.close),
                   ),
                   IconButton.filled(
                     onPressed: () async {
-                      await widget.onSaveTask();
+                      await _todosCubit.saveTask(
+                          textController,
+                          descriptionTextController,
+                          selectedCategoryValue,
+                          dateTime);
+
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.check),
@@ -178,5 +200,13 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // dispose yanlış olabilir.
+    textController.dispose();
+    descriptionTextController.dispose();
+    super.dispose();
   }
 }
