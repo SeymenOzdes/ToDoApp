@@ -18,30 +18,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final TodosRepo _todosRepo;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   late final Future<void> _initHomePage;
+  late final TodosCubit todosCubit;
 
   @override
   void initState() {
     super.initState();
     _initHomePage = initHomePage();
-    _todosRepo = TodosRepo();
+    todosCubit = context.read<TodosCubit>();
 
     Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
 
-      if (_todosRepo.todoItems.isEmpty) {
+      if (todosCubit.todosRepo.todoItems.isEmpty) {
         timer.cancel();
       }
     });
   }
-
-  // void refresh() {
-  //   setState(() {
-  //     print("refrehlendi");
-  //   });
-  // }
 
   void showCustomBottomSheet(BuildContext context) {
     showModalBottomSheet(
@@ -49,7 +43,9 @@ class _HomePageState extends State<HomePage> {
       showDragHandle: true,
       elevation: 0,
       builder: (contex) {
-        return CustomBottomSheet();
+        return CustomBottomSheet(
+          todosCubit: todosCubit,
+        );
       },
     );
   }
@@ -57,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> initHomePage() async {
     final tempList = await _databaseHelper.getTodos();
     setState(() {
-      _todosRepo.todoItems = tempList;
+      todosCubit.todosRepo.todoItems = tempList;
     });
   }
 
@@ -80,42 +76,34 @@ class _HomePageState extends State<HomePage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            return BlocProvider(
-              create: (context) => TodosCubit(),
-              child: BlocListener<TodosCubit, CubitTodosStates>(
-                listener: (context, state) {
-                  if (state is CubitTodosError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.errorMessage)),
-                    );
-                  } else if (state is CubitTodosDeleted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Görev başarıyla silindi!')),
-                    );
-                    setState(() {});
-                  } else if (state is CubitTodosSaving) {
-                  } else if (state is CubitTodosSaved) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Görev başarıyla kaydedildi!')),
-                    );
-                  }
+            return BlocListener<TodosCubit, CubitTodosStates>(
+              listener: (context, state) {
+                if (state is CubitTodosError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(state.errorMessage)),
+                    //TODO: Loading Indicator Kapatılcak
+                  );
+                } else if (state is CubitTodosLoading) {
+                  //TODO: Loading Indicator olcak
+                } else if (state is CubitTodosLoaded) {
+                  setState(() {});
+                  //TODO: Loading Indicator Kapatılcak
+                }
+              },
+              child: ListView.builder(
+                itemCount: todosCubit.todosRepo.todoItems.length,
+                itemBuilder: (BuildContext context, index) {
+                  final todo = todosCubit.todosRepo.todoItems[index];
+                  return Visibility(
+                    visible: todo.isVisible,
+                    child: BlocProvider.value(
+                        value: context.read<TodosCubit>(),
+                        child: ToDoItem(
+                          todoModel: todo,
+                          todoCubit: BlocProvider.of<TodosCubit>(context),
+                        )),
+                  );
                 },
-                child: ListView.builder(
-                  itemCount: _todosRepo.todoItems.length,
-                  itemBuilder: (BuildContext context, index) {
-                    final todo = _todosRepo.todoItems[index];
-                    return Visibility(
-                      visible: todo.isVisible,
-                      child: BlocProvider.value(
-                          value: context.read<TodosCubit>(),
-                          child: ToDoItem(
-                            todoModel: todo,
-                            todoCubit: BlocProvider.of<TodosCubit>(context),
-                          )),
-                    );
-                  },
-                ),
               ),
             );
           }

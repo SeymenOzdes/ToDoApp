@@ -5,30 +5,14 @@ import 'cubit_todos_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TodosCubit extends Cubit<CubitTodosStates> {
-  final TodosRepo _todosRepo = TodosRepo();
+  final TodosRepo todosRepo = TodosRepo();
 
-  TodosCubit() : super(CubitTodosLoading()) {
-    getData();
-  }
-
-  Future<void> getData() async {
-    emit(CubitTodosLoading());
-    print("emitted loading");
-
-    try {
-      List<TodoModel> todos = await _todosRepo.loadTodos();
-      emit(CubitTodosLoaded(todoItems: todos));
-      print("todoloeaded loading");
-    } catch (e) {
-      emit(CubitTodosError(
-          errorMessage: 'Veriler yüklenirken bir hata oluştu: $e'));
-    }
-  }
+  TodosCubit() : super(CubitTodosLoading());
 
   Future<void> saveTask(String taskName, String taskDescription,
       String selectedCategoryValue, DateTime dateTime) async {
     try {
-      emit(CubitTodosSaving());
+      emit(CubitTodosLoading());
 
       final todo = TodoModel(
         id: null,
@@ -40,11 +24,10 @@ class TodosCubit extends Cubit<CubitTodosStates> {
         taskCategory: selectedCategoryValue,
       );
       if (taskName.isNotEmpty && taskDescription.isNotEmpty) {
-        await _todosRepo.saveTask(todo);
+        await todosRepo.saveTask(todo);
       }
-      emit(CubitTodosSaved(savedTodo: _todosRepo.todoItems.last));
+      emit(CubitTodosLoaded());
       print("emitted savetodo");
-      await getData();
     } catch (e) {
       emit(CubitTodosError(errorMessage: 'Görev kaydedilemedi: $e'));
     }
@@ -52,21 +35,26 @@ class TodosCubit extends Cubit<CubitTodosStates> {
 
   Future<void> deleteTask(TodoModel todo) async {
     try {
-      await _todosRepo.deleteTask(todo);
-      await Future.delayed(const Duration(milliseconds: 500));
-      await _todosRepo.loadTodos();
+      emit(CubitTodosLoading());
 
-      emit(CubitTodosDeleted(deletedTodo: todo));
+      await todosRepo.deleteTask(todo);
+      await todosRepo.loadTodos();
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Görev başarıyla silindi!')),
+      // );
+
+      emit(CubitTodosLoaded());
     } catch (e) {
       emit(CubitTodosError(errorMessage: 'Görev silinemedi: $e'));
     }
   }
 
   Future<void> checkBoxChanged(int index) async {
-    await _todosRepo.checkBoxChanged(index);
+    await todosRepo.checkBoxChanged(index);
   }
 
   void updateDropdownValue(String? value, String selectedCategoryValue) {
-    _todosRepo.updateDropdownValue(value, selectedCategoryValue);
+    todosRepo.updateDropdownValue(value, selectedCategoryValue);
   }
 }
