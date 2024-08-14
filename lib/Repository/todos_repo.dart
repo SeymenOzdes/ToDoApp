@@ -57,12 +57,6 @@ class TodosRepo {
         taskCategory: todo.taskCategory);
 
     await _databaseHelper.updateTodo(updatedTodo);
-
-    final index = todoItems.indexWhere((item) => item.id == todo.id);
-
-    if (index != -1) {
-      todoItems[index] = updatedTodo;
-    }
   }
 
   void updateDropdownValue(String? value, String selectedCategoryValue) {

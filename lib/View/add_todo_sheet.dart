@@ -7,29 +7,12 @@ import 'package:flutter/widgets.dart';
 import 'package:logger/web.dart';
 
 class CustomBottomSheet extends StatefulWidget {
-  // final TextEditingController textController;
-  // final TextEditingController descriptionTextController;
-  // final String selectedCategoryValue;
-  // final List<String> categories;
-  // final DateTime initialDateTime;
-  // final Future<void> Function() onSaveTask;
-  // final void Function(String?) onValueChanged;
+  final TodosCubit todosCubit;
 
-  // final void Function(DateTime) onDateSelected;
-
-  // CustomBottomSheet({
-  //   // required this.textController,
-  //   // required this.descriptionTextController,
-  //   // required this.selectedCategoryValue,
-  //   // required this.categories,
-  //   // required this.onSaveTask,
-  //   // required this.onValueChanged,
-  //   // required this.onDateSelected,
-  //   // required this.initialDateTime,
-  // });
-
-  // ignore: recursive_getters
-  List<String> get categories => categories;
+  const CustomBottomSheet({
+    super.key,
+    required this.todosCubit,
+  });
 
   @override
   CustomBottomSheetState createState() => CustomBottomSheetState();
