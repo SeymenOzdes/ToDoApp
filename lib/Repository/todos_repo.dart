@@ -21,7 +21,7 @@ class TodosRepo {
     try {
       log.i(todoItems.indexed);
       await _databaseHelper.insertTodo(todo);
-      await loadTodos();
+      // await loadTodos();
     } catch (e) {
       log.e('Error inserting todo: $e');
     }

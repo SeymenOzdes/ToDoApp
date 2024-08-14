@@ -3,7 +3,6 @@
 import 'package:first_app/cubits/todos_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:logger/web.dart';
 
 class CustomBottomSheet extends StatefulWidget {
@@ -169,7 +168,6 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                           descriptionTextController.value.text,
                           selectedCategoryValue,
                           dateTime);
-
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.check),

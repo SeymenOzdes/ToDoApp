@@ -1,5 +1,3 @@
-import 'package:first_app/Model/todo_model.dart';
-
 abstract class CubitTodosStates {}
 
 class CubitTodosLoading extends CubitTodosStates {}

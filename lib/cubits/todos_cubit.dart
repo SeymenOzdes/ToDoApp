@@ -1,6 +1,5 @@
 import 'package:first_app/Model/todo_model.dart';
 import 'package:first_app/Repository/todos_repo.dart';
-import 'package:flutter/material.dart';
 import 'cubit_todos_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,7 +24,9 @@ class TodosCubit extends Cubit<CubitTodosStates> {
       );
       if (taskName.isNotEmpty && taskDescription.isNotEmpty) {
         await todosRepo.saveTask(todo);
+        await todosRepo.loadTodos();
       }
+
       emit(CubitTodosLoaded());
       print("emitted savetodo");
     } catch (e) {
