@@ -19,18 +19,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final TodosRepo _todosRepo;
-  late final TodosCubit _todosCubit;
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   late final Future<void> _initHomePage;
-  // late final TodosCubit todosCubit;
 
   @override
   void initState() {
     super.initState();
     _initHomePage = initHomePage();
-    _todosRepo = TodosRepo(onTodosLoaded: () => {});
-    _todosCubit = TodosCubit();
-    // _controller = ViewController(onTodosLoaded: refresh);
+    _todosRepo = TodosRepo();
 
     Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
@@ -41,40 +37,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void refresh() {
-    setState(() {
-      print("refrehlendi");
-    });
-  }
+  // void refresh() {
+  //   setState(() {
+  //     print("refrehlendi");
+  //   });
+  // }
 
-  //burası
   void showCustomBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
       elevation: 0,
       builder: (contex) {
-        return CustomBottomSheet(
-            // veriler _todosRepodan gelmicek. Bottom sheet içerisinde tanımlı olucak.
-            // textController: _todosRepo.textController,
-            // descriptionTextController: _todosRepo.descriptionTextController,
-            // selectedCategoryValue: _todosRepo.selectedCategoryValue,
-            // categories: _todosRepo.categories,
-            // onSaveTask: _todosRepo.saveTask(),
-            // onValueChanged: (value) {
-            //   // _todosRepo.updateDropdownValue(value); // OnValueChanged değişicek.
-            //   setState(() {});
-            // },
-
-            // onDateSelected: (DateTime newDate) {
-            //   if (mounted) {
-            //     setState(() {
-            //       _todosRepo.dateTime = newDate;
-            //     });
-            //   }
-            // },
-            // initialDateTime: _todosRepo.dateTime,
-            );
+        return CustomBottomSheet();
       },
     );
   }
@@ -137,20 +112,6 @@ class _HomePageState extends State<HomePage> {
                           child: ToDoItem(
                             todoModel: todo,
                             todoCubit: BlocProvider.of<TodosCubit>(context),
-                            // onChanged: (value) {
-                            //   context.read<TodosCubit>().checkBoxChanged(index);
-                            //   if (mounted) {
-                            //     setState(() {});
-                            //   }
-                            // },
-                            // deleteTask: (context) async {
-                            //   print("deleted task");
-
-                            //   await context.read<TodosCubit>().deleteTask(todo);
-                            //   if (mounted) {
-                            //     setState(() {});
-                            //   }
-                            // },
                           )),
                     );
                   },

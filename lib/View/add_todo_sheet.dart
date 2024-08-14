@@ -36,7 +36,6 @@ class CustomBottomSheet extends StatefulWidget {
 }
 
 class CustomBottomSheetState extends State<CustomBottomSheet> {
-  // DateTime selectedDateTime = DateTime.now();
   late String selectedCategoryValue;
   late TextEditingController textController;
   late TextEditingController descriptionTextController;
@@ -146,11 +145,10 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: DropdownButton<String>(
-                  value: selectedCategoryValue.isNotEmpty // burdan emin değilim
+                  value: selectedCategoryValue.isNotEmpty
                       ? selectedCategoryValue
                       : null,
                   onChanged: (String? newValue) {
-                    // onValueChanged(newValue);
                     _todosCubit.updateDropdownValue(newValue,
                         selectedCategoryValue); // OnValueChanged değişicek.
 
@@ -184,8 +182,8 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                   IconButton.filled(
                     onPressed: () async {
                       await _todosCubit.saveTask(
-                          textController,
-                          descriptionTextController,
+                          textController.value.text,
+                          descriptionTextController.value.text,
                           selectedCategoryValue,
                           dateTime);
 

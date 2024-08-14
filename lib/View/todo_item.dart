@@ -1,31 +1,17 @@
 import 'package:first_app/Model/todo_model.dart';
 import 'package:first_app/cubits/todos_cubit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 class ToDoItem extends StatelessWidget {
-  // final Function(bool?)? onChanged;
-  // final Function(BuildContext) deleteTask;
   final TodoModel todoModel;
   final TodosCubit todoCubit;
-  // final String taskName;
-  // final bool taskCompleted;
-  // final DateTime taskDate;
-  // final String taskCategory;
 
   const ToDoItem({
     super.key,
     required this.todoModel,
     required this.todoCubit,
-
-    // required this.onChanged,
-    // required this.deleteTask,
-    // required this.taskName,
-    // required this.taskCompleted,
-    // required this.taskDate,
-    // required this.taskCategory,
   });
 
   @override
