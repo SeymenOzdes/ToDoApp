@@ -36,7 +36,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
     categories = ["Gündelik", "İş", "Okul"];
     initialDateTime = DateTime.now();
     dateTime = DateTime.now();
-    _todosCubit = TodosCubit();
+    _todosCubit = widget.todosCubit;
   }
 
   void showDatePickerSheet() {
@@ -168,6 +168,8 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                           descriptionTextController.value.text,
                           selectedCategoryValue,
                           dateTime);
+
+                      if (!context.mounted) return;
                       Navigator.pop(context);
                     },
                     icon: const Icon(Icons.check),
@@ -183,8 +185,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
 
   @override
   void dispose() {
-    // dispose yanlış olabilir.
-    textController.dispose();
+    textController.dispose(); // dispose yanlış olabilir.
     descriptionTextController.dispose();
     super.dispose();
   }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:first_app/Controller/database_helper.dart';
-import 'package:first_app/Repository/todos_repo.dart';
 import 'package:first_app/View/loading_indicator.dart';
 import 'package:first_app/View/todo_item.dart';
 import 'package:first_app/cubits/cubit_todos_states.dart';

@@ -24,7 +24,6 @@ class TodosCubit extends Cubit<CubitTodosStates> {
       );
       if (taskName.isNotEmpty && taskDescription.isNotEmpty) {
         await todosRepo.saveTask(todo);
-        await todosRepo.loadTodos();
       }
 
       emit(CubitTodosLoaded());

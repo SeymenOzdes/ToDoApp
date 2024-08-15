@@ -19,9 +19,9 @@ class TodosRepo {
 
   Future<void> saveTask(TodoModel todo) async {
     try {
-      log.i(todoItems.indexed);
       await _databaseHelper.insertTodo(todo);
-      // await loadTodos();
+      await loadTodos();
+      log.i(todoItems);
     } catch (e) {
       log.e('Error inserting todo: $e');
     }
