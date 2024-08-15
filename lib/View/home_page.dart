@@ -20,12 +20,15 @@ class _HomePageState extends State<HomePage> {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   late final Future<void> _initHomePage;
   late final TodosCubit todosCubit;
+  late final LoadingIndicator _loadingIndicator;
+  // bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _initHomePage = initHomePage();
     todosCubit = context.read<TodosCubit>();
+    _loadingIndicator = LoadingIndicator(context);
 
     Timer.periodic(const Duration(minutes: 5), (timer) {
       _databaseHelper.deleteTodo();
@@ -58,6 +61,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // if (isLoading) {
+    //   _loadingIndicator.show();
+    // } else if (isLoading == false) {
+    //   _loadingIndicator.hide();
+    // }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -71,21 +79,25 @@ class _HomePageState extends State<HomePage> {
         future: _initHomePage,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: LoadingIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             return BlocListener<TodosCubit, CubitTodosStates>(
               listener: (context, state) {
                 if (state is CubitTodosError) {
+                  _loadingIndicator.hide();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.errorMessage)),
                     //TODO: Loading Indicator Kapatılcak
                   );
                 } else if (state is CubitTodosLoading) {
                   //TODO: Loading Indicator olcak
+                  _loadingIndicator.show();
                 } else if (state is CubitTodosLoaded) {
-                  setState(() {});
+                  setState(() {
+                    _loadingIndicator.hide();
+                  });
                   //TODO: Loading Indicator Kapatılcak
                 }
               },
