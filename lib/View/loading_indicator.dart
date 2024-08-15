@@ -20,7 +20,7 @@ class LoadingIndicator {
           child: Center(
             child: SpinKitRing(
               color: Colors.white,
-              size: 75,
+              size: 60,
             ),
           ),
         ),

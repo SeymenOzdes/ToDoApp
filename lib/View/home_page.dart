@@ -89,16 +89,13 @@ class _HomePageState extends State<HomePage> {
                   _loadingIndicator.hide();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.errorMessage)),
-                    //TODO: Loading Indicator Kapatılcak
                   );
                 } else if (state is CubitTodosLoading) {
-                  //TODO: Loading Indicator olcak
                   _loadingIndicator.show();
                 } else if (state is CubitTodosLoaded) {
                   setState(() {
                     _loadingIndicator.hide();
                   });
-                  //TODO: Loading Indicator Kapatılcak
                 }
               },
               child: ListView.builder(
