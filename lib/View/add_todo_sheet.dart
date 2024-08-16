@@ -1,8 +1,7 @@
-// import 'package:first_app/Controller/view_controller.dart';
-// import 'package:first_app/Repository/todos_repo.dart';
 import 'package:first_app/cubits/todos_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/web.dart';
 
 class CustomBottomSheet extends StatefulWidget {
@@ -23,8 +22,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
   late TextEditingController descriptionTextController;
   late final TodosCubit _todosCubit;
   late final List<String> categories;
-  late DateTime initialDateTime;
-  late DateTime dateTime;
+  DateTime? initialDateTime;
   Logger log = Logger();
 
   @override
@@ -34,8 +32,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
     descriptionTextController = TextEditingController();
     selectedCategoryValue = "";
     categories = ["Gündelik", "İş", "Okul"];
-    initialDateTime = DateTime.now();
-    dateTime = DateTime.now();
+    // initialDateTime = DateTime.now();
     _todosCubit = widget.todosCubit;
   }
 
@@ -53,7 +50,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
               children: [
                 Expanded(
                   child: CupertinoDatePicker(
-                    initialDateTime: initialDateTime,
+                    initialDateTime: initialDateTime ?? DateTime.now(),
                     minimumYear: 2024,
                     onDateTimeChanged: (DateTime newTime) {
                       setState(() {
@@ -67,7 +64,11 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                   onPressed: () {
                     Navigator.pop(context);
                     setState(() {
-                      dateTime = initialDateTime;
+                      if (initialDateTime != null) {
+                        initialDateTime = initialDateTime!;
+                      } else {
+                        initialDateTime = DateTime.now();
+                      }
                     });
                   },
                   child: const Text("Save"),
@@ -116,7 +117,10 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                   padding: const EdgeInsets.only(top: 12),
                   child: ElevatedButton.icon(
                     onPressed: showDatePickerSheet,
-                    label: const Text("Select Due Date"),
+                    label: Text(initialDateTime != null
+                        ? DateFormat('yyyy-MM-dd HH:mm')
+                            .format(initialDateTime!)
+                        : "Select due date"),
                     icon: const Icon(Icons.flag),
                   ),
                 ),
@@ -167,7 +171,7 @@ class CustomBottomSheetState extends State<CustomBottomSheet> {
                           textController.value.text,
                           descriptionTextController.value.text,
                           selectedCategoryValue,
-                          dateTime);
+                          initialDateTime!);
 
                       if (!context.mounted) return;
                       Navigator.pop(context);
