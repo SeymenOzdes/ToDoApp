@@ -1,7 +1,7 @@
 class TodoModel {
   final int? id;
   final String taskName;
-  final bool taskCompleted;
+  bool taskCompleted;
   bool isVisible;
   final String taskDescription;
   final DateTime taskDate;

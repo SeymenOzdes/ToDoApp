@@ -4,15 +4,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
-class ToDoItem extends StatelessWidget {
+class ToDoItem extends StatefulWidget {
+  @override
+  _ToDoItemState createState() => _ToDoItemState();
+
   final TodoModel todoModel;
   final TodosCubit todoCubit;
-
   const ToDoItem({
     super.key,
     required this.todoModel,
     required this.todoCubit,
   });
+}
+
+class _ToDoItemState extends State<ToDoItem> {
+  late final TodoModel _todoModel;
+  late final TodosCubit _todoCubit;
+  bool _isChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _todoModel = widget.todoModel;
+    _todoCubit = widget.todoCubit;
+    _isChecked = _todoModel.taskCompleted;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +40,7 @@ class ToDoItem extends StatelessWidget {
         startActionPane: ActionPane(motion: const StretchMotion(), children: [
           SlidableAction(
             onPressed: (value) async {
-              await todoCubit.deleteTask(todoModel);
+              await _todoCubit.deleteTask(_todoModel);
             },
             icon: Icons.delete,
             backgroundColor: Colors.red,
@@ -38,9 +54,13 @@ class ToDoItem extends StatelessWidget {
             child: Row(
               children: [
                 Checkbox(
-                  value: todoModel.taskCompleted,
+                  value: _isChecked,
                   onChanged: (value) async {
-                    await todoCubit.deleteTask(todoModel);
+                    setState(() {
+                      _isChecked = value!;
+                      _todoModel.taskCompleted = _isChecked;
+                    });
+                    await _todoCubit.deleteTask(_todoModel);
                   },
                   side: const BorderSide(color: Colors.white),
                 ),
@@ -48,12 +68,12 @@ class ToDoItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      todoModel.taskName,
+                      _todoModel.taskName,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         fontSize: 20,
-                        decoration: todoModel.taskCompleted
+                        decoration: _todoModel.taskCompleted
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
                         decorationColor: Colors.white,
@@ -61,7 +81,7 @@ class ToDoItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      todoModel.taskDescription,
+                      _todoModel.taskDescription,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -72,7 +92,7 @@ class ToDoItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          formatter.format(todoModel.taskDate),
+                          formatter.format(_todoModel.taskDate),
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
                         ),
@@ -80,7 +100,7 @@ class ToDoItem extends StatelessWidget {
                           width: 16,
                         ),
                         Text(
-                          todoModel.taskCategory,
+                          _todoModel.taskCategory,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
                         )

@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
   late final Future<void> _initHomePage;
   late final TodosCubit todosCubit;
   late final LoadingIndicator _loadingIndicator;
-  // bool isLoading = false;
 
   @override
   void initState() {
@@ -61,11 +60,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // if (isLoading) {
-    //   _loadingIndicator.show();
-    // } else if (isLoading == false) {
-    //   _loadingIndicator.hide();
-    // }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
